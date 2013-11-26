@@ -7,28 +7,22 @@ Ox.getVideoFormat <f> Get supported video format
 @*/
 Ox.getVideoFormat = function(formats) {
     var aliases = {
-						/*wafaa*/
-            /*mp4: 'h264',
+            mp4: 'h264',
             m4v: 'h264',
-            ogv: 'ogg',*/
-						png: 'png'
+            ogv: 'ogg'
         },
         tests = {
-						/*wafaa*/
-            /*h264: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+            h264: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
             ogg: 'video/ogg; codecs="theora, vorbis"',
-            webm: 'video/webm; codecs="vp8, vorbis"',*/
-            png: 'image/png'
+            webm: 'video/webm; codecs="vp8, vorbis"'
         },
         userAgent = navigator.userAgent.toLowerCase(),
 				/*wafaa*/
-        /*video = document.createElement('video'),*/
-        video = document.createElement('img'),
+        video = document.createElement('video'),
         videoFormat;
     Ox.forEach(formats, function(format) {
         var alias = aliases[format] || format;
     		videoFormat = format;
-				/*wafaa
         if (video.canPlayType && video.canPlayType(tests[alias]).replace('no', '')) {
             // disable WebM on Safari/Perian, seeking does not work
             if (!(
@@ -39,9 +33,8 @@ Ox.getVideoFormat = function(formats) {
                 return false; // break
             }
         }
-				*/
+
     });
-				/*wafaa*/
     return videoFormat;
 };
 
@@ -51,9 +44,7 @@ Ox.getVideoInfo <f>
     callback <f> gets called with object containing duration, width, height
 @*/
 Ox.getVideoInfo = Ox.queue(function(url, callback) {
-		/*wafaa*/
-    /*var video = document.createElement('video');*/
-    var video = document.createElement('img');
+    var video = document.createElement('video');
     video.addEventListener('loadedmetadata', function(event) {
         var info = {
             duration: this.duration,
