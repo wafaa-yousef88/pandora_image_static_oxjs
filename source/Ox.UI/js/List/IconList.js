@@ -1,0 +1,279 @@
+'use strict';
+/*@
+Ox.IconList <f> IconList Object
+    options <o> Options object
+        borderRadius <n|0> border radius for icon images
+        centered <b|false> scroll list so selection is always centered
+        defaultRatio <n|1> aspect ratio of icon placeholders
+        draggable <b|false> If true, items can be dragged
+        fixedRatio <b|n|false> if set to a number, icons have a fixed ratio
+        id <s|''> element id
+        item <f|null> called with data, sort, size,
+                      extends data with information needed for constructor
+        itemConstructor <f|Ox.IconItem> contructor used to create item
+        items <f|null> items array or callback function
+        keys <a|[]> available item keys
+        max <n|-1> maximum selected selected items
+        min <n|0> minimum of selcted items
+        orientation <s|both> orientation ("horizontal", "vertical" or "both")
+        pageLength <n|100> Number of items per page (if orientation != "both")
+        query <o> Query
+        selectAsYouType <s|''> If set to a key, enables select-as-you-type
+        selected <a|[]> array of selected items
+        size <n|128> list size
+        sort <a|[]> sort keys
+        sums <[s]|[]> Sums to be included in totals
+    self <o> Shared private variable
+    ([options[, self]]) -> <o:Ox.List> IconList Object
+@*/
+
+Ox.IconList = function(options, self) {
+
+    self = self || {};
+    var that = Ox.Element({}, self)
+            .defaults({
+                borderRadius: 0,
+                centered: false,
+                defaultRatio: 1,
+                draggable: false,
+                find: '',
+                fixedRatio: false,
+                id: '',
+                item: null,
+                itemConstructor: Ox.IconItem,
+                items: null,
+                keys: [],
+                max: -1,
+                min: 0,
+                orientation: 'both',
+                pageLength: 100,
+                query: {conditions: [], operator: '&'},
+                selectAsYouType: '',
+                selected: [],
+                size: 128,
+                sort: [],
+                sums: [],
+                unique: ''
+            })
+            .options(options || {})
+            .update({
+                items: function() {
+                    that.$element.options({items: self.options.items});
+                },
+                query: function() {
+                    that.$element.options({query: self.options.query});
+                },
+                selected: function() {
+                    that.$element.options({selected: self.options.selected});
+                },
+                sort: function() {
+                    updateKeys();
+                    that.$element.options({sort: self.options.sort});
+                }
+            });
+
+    if (self.options.fixedRatio) {
+        self.options.defaultRatio = self.options.fixedRatio;
+    }
+
+    if (Ox.isArray(self.options.items)) {
+        self.options.keys = Ox.unique(Ox.flatten(
+            self.options.items.map(function(item) {
+                return Object.keys(item);
+            })
+        ));
+    }
+
+    self.iconWidth = self.options.size;
+    self.iconHeight = self.options.fixedRatio > 1
+        ? Math.round(self.options.size / self.options.fixedRatio)
+        : self.options.size;
+    self.itemWidth = self.options.size;
+    self.itemHeight = self.iconHeight + self.options.size * 0.5;
+
+    that.setElement(
+        Ox.List({
+            centered: self.options.centered,
+            // fixme: change all occurences of construct to render
+            construct: constructItem,
+            draggable: self.options.draggable,
+            id: self.options.id,
+            itemHeight: self.itemHeight,
+            items: self.options.items,
+            itemWidth: self.itemWidth,
+            keys: self.options.keys,
+            max: self.options.max,
+            min: self.options.min,
+            orientation: self.options.orientation,
+            pageLength: self.options.pageLength,
+            query: self.options.query,
+            selectAsYouType: self.options.selectAsYouType,
+            selected: self.options.selected,
+            sort: self.options.sort,
+            sums: self.options.sums,
+            type: 'icon',
+            unique: self.options.unique
+        })
+        .addClass('OxIconList Ox' + Ox.toTitleCase(self.options.orientation))
+        .bindEvent(function(data, event) {
+            if (event == 'select') {
+                self.options.selected = data.ids;
+            }
+            that.triggerEvent(event, data);
+        })
+    );
+
+    updateKeys();
+
+    function constructItem(data) {
+        var isEmpty = Ox.isEmpty(data);
+        data = !isEmpty
+            ? self.options.item(data, self.options.sort, self.options.size)
+            : {
+                width: Math.round(self.options.size * (
+                    self.options.defaultRatio >= 1 ? 1 : self.options.defaultRatio
+                )),
+                height: Math.round(self.options.size / (
+                    self.options.defaultRatio <= 1 ? 1 : self.options.defaultRatio
+                ))
+            };
+        return self.options.itemConstructor(Ox.extend(data, {
+            borderRadius: self.options.borderRadius,
+            find: self.options.find,
+            iconHeight: self.iconHeight,
+            iconWidth: self.iconWidth,
+            imageHeight: data.height,
+            imageWidth: data.width,
+            itemHeight: self.itemHeight,
+            itemWidth: self.itemWidth
+            //height: Math.round(self.options.size / (ratio <= 1 ? 1 : ratio)),
+            //size: self.options.size,
+            //width: Math.round(self.options.size * (ratio >= 1 ? 1 : ratio))
+        }));
+    }
+
+    function updateKeys() {
+        that.$element.options({
+            keys: Ox.unique(
+                [self.options.sort[0].key].concat(self.options.keys)
+            )
+        });
+    }
+
+    /*@
+    closePreview <f> close preview
+        () -> <o> the list
+    @*/
+    that.closePreview = function() {
+        that.$element.closePreview();
+        return that;
+    };
+
+    /*@
+    gainFocus <f> gainFocus
+    @*/
+    that.gainFocus = function() {
+        that.$element.gainFocus();
+        return that;
+    };
+
+    /*@
+    hasFocus <f> hasFocus
+    @*/
+    that.hasFocus = function() {
+        return that.$element.hasFocus();
+    };
+
+    that.invertSelection = function() {
+        that.$element.invertSelection();
+        return that;
+    };
+
+    /*@
+    loseFocus <f> loseFocus
+    @*/
+    that.loseFocus = function() {
+        that.$element.loseFocus();
+        return that;
+    };
+
+    /*@
+    reloadList <f> reload list
+        () -> <o> the list
+    @*/
+    that.reloadList = function() {
+        that.$element.reloadList();
+        return that;
+    };
+
+    /*@
+    scrollToSelection <f> scroll list to selection
+        () -> <o> the list
+    @*/
+    that.scrollToSelection = function() {
+        that.$element.scrollToSelection();
+        return that;
+    };
+
+    that.selectAll = function() {
+        that.$element.selectAll();
+        return that;
+    };
+
+    /*@
+    size <f> get size of list
+        () -> <n> size
+    @*/
+    that.size = function() {
+        that.$element.size();
+        return that;
+    };
+
+    // fixme: deprecate, use options()
+    /*@
+    sortList <f> sort list
+        (key, operator) -> <o> the list
+        key <s> sort key
+        operator <s> sort operator ("+" or "-")
+    @*/
+    that.sortList = function(key, operator) {
+        self.options.sort = [{
+            key: key,
+            operator: operator
+        }];
+        updateKeys();
+        that.$element.sortList(key, operator);
+        return that;
+    };
+
+    /*@
+    value <f> get/set value of item in list
+        (id) -> <o> get all data for item
+        (id, key) -> <s> get value of key of item with id
+        (id, key, value) -> <f> set value, returns IconList
+    @*/
+    that.value = function(id, key, value) {
+        // fixme: make this accept id, {k: v, ...}
+        if (arguments.length == 1) {
+            return that.$element.value(id);
+        } else if (arguments.length == 2) {
+            return that.$element.value(id, key);
+        } else {
+            that.$element.value(id, key, value);
+            if (key == self.unique) {
+                // unique id has changed
+                self.options.selected = self.options.selected.map(function(id_) {
+                    return id_ == id ? value : id_
+                });
+            }
+            if (key == self.options.sort[0].key) {
+                // sort key has changed
+                that.$element.sort();
+            }
+            return that;
+        }
+    };
+
+    return that;
+
+};
