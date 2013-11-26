@@ -88,13 +88,11 @@ Ox.Element = function(options, self) {
     var that = new Ox.JQueryElement($(self.options.element || '<div>'))
         .addClass('OxElement')
         .on({mousedown: mousedown});
-
     if (self.options.element == '<iframe>') {
         that.on('load', function() {
             Ox.Message.post(that, 'init', {id: that.oxid});
         });
     }
-
     setTooltip();
 
     function mousedown(e) {

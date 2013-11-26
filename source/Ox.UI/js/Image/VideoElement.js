@@ -114,7 +114,9 @@ Ox.VideoElement = function(options, self) {
     }
 
     function getVideo() {
-        return $('<video>')
+				/*wafaa*/
+        /*return $('<video>')*/
+        return $('<img>')
             .css({position: 'absolute'})
             .on({
                 ended: function() {
@@ -264,6 +266,7 @@ Ox.VideoElement = function(options, self) {
                 });
             });
         }
+
     }
 
     function setCurrentVideo() {

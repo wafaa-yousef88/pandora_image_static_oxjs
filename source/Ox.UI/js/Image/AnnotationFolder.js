@@ -255,7 +255,7 @@ Ox.AnnotationFolder = function(options, self) {
                 drag: drag,
                 dragend: dragend
             })
-            .appendTo(self.$outer);         
+            .appendTo(self.$outer); 
     }
 
     self.$annotations = Ox.ArrayEditable({

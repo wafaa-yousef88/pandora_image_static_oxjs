@@ -226,7 +226,8 @@ Ox.VideoPlayer = function(options, self) {
                 self.$timeline.options({imageURL: self.options.timeline});
             },
             video: function() {
-                setVideo();
+ /* wafaa- uwe */
+                setImage();
                 self.$video.options({
                     items: self.video
                 });
@@ -2270,6 +2271,19 @@ Ox.VideoPlayer = function(options, self) {
                 self.options.resolution = self.resolutions[0];
             }
             self.video = self.options.video[self.options.resolution];
+        } else {
+            self.video = self.options.video;
+        }
+    }
+ /* wafaa- uwe */
+    function setImage() {
+        if (Ox.isObject(self.options.video)) {
+            self.resolutions = Ox.sort(Object.keys(self.options.video));
+            if (!(self.options.resolution in self.options.video)) {
+                self.options.resolution = self.resolutions[0];
+            }
+            self.video = self.options.video[self.options.resolution];
+																						console.log(self.options.video);
         } else {
             self.video = self.options.video;
         }
