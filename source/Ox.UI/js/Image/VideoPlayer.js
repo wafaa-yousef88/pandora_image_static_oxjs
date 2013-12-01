@@ -2276,7 +2276,6 @@ Ox.VideoPlayer = function(options, self) {
         }
     }
  /* wafaa- uwe */
-		/*
     function setImage() {
         if (Ox.isObject(self.options.video)) {
             self.resolutions = Ox.sort(Object.keys(self.options.video));
@@ -2289,7 +2288,6 @@ Ox.VideoPlayer = function(options, self) {
             self.video = self.options.video;
         }
     }
-*/
     function setVolume(volume) {
         self.options.volume = volume;
         if (!!self.options.volume == self.options.muted) {

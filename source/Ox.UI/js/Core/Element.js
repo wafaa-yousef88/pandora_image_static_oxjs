@@ -93,7 +93,7 @@ Ox.Element = function(options, self) {
             Ox.Message.post(that, 'init', {id: that.oxid});
         });
     }
-    /*setTooltip();*/
+    setTooltip();
 
     function mousedown(e) {
         /*

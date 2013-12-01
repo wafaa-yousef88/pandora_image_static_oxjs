@@ -202,14 +202,17 @@ Ox.VideoPlayerPanel = function(options, self) {
     self.$player = Ox.Element().css({overflow: 'hidden'});
 		/*wafaa*/
 		if (self.options.video) {
-			$('<div class="ImgControls"><button id="btn_240">Display Img: 240px</button><button id="btn_480">Display Img: 480px</button></div>').appendTo(self.$player);
-			$('<div class="ImgPanel"></div>').appendTo(self.$player);
+			$('<div class="ImgControls"><button id="btn_240" style="border-radius: 50px; border: 1px solid #000;">Low Resolution 240px</button><button id="btn_480" style="border-radius: 50px; border: 1px solid #000;">High Resolution 480px</button></div>').appendTo(self.$player);
+			$('<img>').attr({src:self.options.video['240']['0'].src}).css({}).attr({id: 'defaultimg240', height: '96'}).appendTo(self.$player);
+			//$('<div class="ImgPanel"></div>').appendTo(self.$player);
 			$(document).on('click','#btn_240',function(){
 				$('img#img480').remove();
+				$('img#defaultimg240').remove();
 				$('<img>').attr({src:self.options.video['240']['0'].src}).css({}).attr({id: 'img240'}).appendTo(self.$player);
 			});			
 			$(document).on('click','#btn_480',function(){
 				$('img#img240').remove();
+				$('img#defaultimg240').remove();
 				$('<img>').attr({src:self.options.video['480']['0'].src}).css({}).attr({id: 'img480'}).appendTo(self.$player);
 			});
 		}
@@ -303,8 +306,7 @@ Ox.VideoPlayerPanel = function(options, self) {
         .appendTo(self.$player);*/
 
     self.$controls = Ox.Element()
-        /*wafaa
-				.addClass('OxMedia')*/
+				.addClass('OxMedia')
         .bindEvent({
             toggle: toggleControls
         });
@@ -339,7 +341,8 @@ Ox.VideoPlayerPanel = function(options, self) {
                     collapsed: !self.options.showTimeline,
                     collapsible: true,
                     element: self.$controls,
-                    size: 80,
+                    //wafaa 
+										//size: 80,
                     tooltip: self.options.timelineTooltip
                 }
             ],
