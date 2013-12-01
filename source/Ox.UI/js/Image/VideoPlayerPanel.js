@@ -202,7 +202,7 @@ Ox.VideoPlayerPanel = function(options, self) {
     self.$player = Ox.Element().css({overflow: 'hidden'});
 		/*wafaa*/
 		if (self.options.video) {
-			$('<div class="ImgControls"><button id="btn_240" style="border-radius: 50px; border: 1px solid #000;">Low Resolution 240px</button><button id="btn_480" style="border-radius: 50px; border: 1px solid #000;">High Resolution 480px</button></div>').appendTo(self.$player);
+    	$('<div class="ImgControls"><button id="btn_240" style="border-radius: 50px; border: 1px solid #000;">Low Resolution 240px</button><button id="btn_480" style="border-radius: 50px; border: 1px solid #000;">High Resolution 480px</button></div>').appendTo(self.$player);
 			$('<img>').attr({src:self.options.video['240']['0'].src}).css({}).attr({id: 'defaultimg240', height: '96'}).appendTo(self.$player);
 			//$('<div class="ImgPanel"></div>').appendTo(self.$player);
 			$(document).on('click','#btn_240',function(){
@@ -214,8 +214,9 @@ Ox.VideoPlayerPanel = function(options, self) {
 				$('img#img240').remove();
 				$('img#defaultimg240').remove();
 				$('<img>').attr({src:self.options.video['480']['0'].src}).css({}).attr({id: 'img480'}).appendTo(self.$player);
-			});
-		}
+
+			});			
+			}
 		/*console.log(self.options.video['240']['0']['src']);*/
 		/*wafaa commented*/
     /*self.$video = Ox.VideoPlayer({
