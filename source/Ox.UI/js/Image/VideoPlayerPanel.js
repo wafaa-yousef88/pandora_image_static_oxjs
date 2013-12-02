@@ -84,25 +84,30 @@ Ox.VideoPlayerPanel = function(options, self) {
         .options(options || {})
         .update({
             fullscreen: function() {
-                self.$video.options({fullscreen: self.options.fullscreen});
+                //wafaa
+								//self.$video.options({fullscreen: self.options.fullscreen});
             },
             height: function() {
-                self.$video.options({height: getPlayerHeight()});
+                //wafaa
+                //self.$video.options({height: getPlayerHeight()});
             },
             'in': function() {
                 setPoint('in', self.options['in']);
             },
             loop: function() {
-                self.$video.options({loop: self.options.loop});
+                //wafaa
+                //self.$video.options({loop: self.options.loop});
             },
             out: function() {
                 setPoint('out', self.options.out);
             },
             paused: function() {
-                self.$video.options({paused: self.options.paused});
+                //wafaa
+                //self.$video.options({paused: self.options.paused});
             },
             position: function() {
-                self.$video.options({position: self.options.position});
+								//wafaa
+                //self.$video.options({position: self.options.position});
                 /*wafaa
 								self.$timeline.options({position: self.options.position});*/
                 self.$annotationPanel.options({position: self.options.position});
@@ -121,7 +126,8 @@ Ox.VideoPlayerPanel = function(options, self) {
 								self.$timeline.options({type: self.options.timeline});*/
             },
             width: function() {
-                self.$video.options({width: getPlayerWidth()});
+                //wafaa
+								//self.$video.options({width: getPlayerWidth()});
                 //wafaa
 								/*self.$timeline.options({width: getTimelineWidth()});*/
             }
@@ -154,7 +160,8 @@ Ox.VideoPlayerPanel = function(options, self) {
                 movePositionTo('cut', 1);
             },
             key_equal: function() {
-                self.$video.changeVolume(0.1);
+								//wafaa
+                //self.$video.changeVolume(0.1);
             },
             key_i: function() {
                 self.$annotationPanel.options({selected: ''});
@@ -165,7 +172,8 @@ Ox.VideoPlayerPanel = function(options, self) {
                 movePositionBy(-1 / self.options.fps);
             },
             key_minus: function() {
-                self.$video.changeVolume(-0.1);
+								//wafaa
+                //self.$video.changeVolume(-0.1);
             },
             key_o: function() {
                 self.$annotationPanel.options({selected: ''});
@@ -201,22 +209,25 @@ Ox.VideoPlayerPanel = function(options, self) {
     self.results = [];
     self.$player = Ox.Element().css({overflow: 'hidden'});
 		/*wafaa*/
-		if (self.options.video) {
-    	$('<div class="ImgControls"><button id="btn_240" style="border-radius: 50px; border: 1px solid #000;">Low Resolution 240px</button><button id="btn_480" style="border-radius: 50px; border: 1px solid #000;">High Resolution 480px</button></div>').appendTo(self.$player);
-			$('<img>').attr({src:self.options.video['240']['0'].src}).css({}).attr({id: 'defaultimg240', height: '96'}).appendTo(self.$player);
+		//if (self.options.video) {
+		$('<div class="ImgControls"><button id="btn_240" style="border-radius: 50px; border: 1px solid #000;">Low Resolution 240px</button><button id="btn_480" style="border-radius: 50px; border: 1px solid #000;">High Resolution 480px</button></div>').appendTo(self.$player);
+		var ImgPanel = $('<div class="ImgPanel"></div>').appendTo(self.$player);
+			$('<img>').attr({src:self.options.video['240']['0'].src}).attr({id: 'defaultimg240', height: '96'}).appendTo(ImgPanel).show();
+			$('<img>').attr({src:self.options.video['240']['0'].src}).attr({id: 'img240'}).appendTo(ImgPanel).hide();
+			$('<img>').attr({src:self.options.video['480']['0'].src}).attr({id: 'img480'}).appendTo(ImgPanel).hide();
+
 			//$('<div class="ImgPanel"></div>').appendTo(self.$player);
 			$(document).on('click','#btn_240',function(){
-				$('img#img480').remove();
-				$('img#defaultimg240').remove();
-				$('<img>').attr({src:self.options.video['240']['0'].src}).css({}).attr({id: 'img240'}).appendTo(self.$player);
+				$('img#defaultimg240').hide();
+				$('img#img480').hide();
+				$('img#img240').show();							
 			});			
 			$(document).on('click','#btn_480',function(){
-				$('img#img240').remove();
-				$('img#defaultimg240').remove();
-				$('<img>').attr({src:self.options.video['480']['0'].src}).css({}).attr({id: 'img480'}).appendTo(self.$player);
-
+				$('img#defaultimg240').hide();
+				$('img#img240').hide();
+				$('img#img480').show();							
 			});			
-			}
+			//}
 		/*console.log(self.options.video['240']['0']['src']);*/
 		/*wafaa commented*/
     /*self.$video = Ox.VideoPlayer({
@@ -449,7 +460,8 @@ Ox.VideoPlayerPanel = function(options, self) {
 
     function dragTimeline(data) {
         self.options.position = data.position;
-        self.$video.options({position: self.options.position});
+        //wafaa
+				//self.$video.options({position: self.options.position});
         self.$annotationPanel.options({position: self.options.position});
     }
 
@@ -493,7 +505,8 @@ Ox.VideoPlayerPanel = function(options, self) {
     }
 
     function playInToOut() {
-        self.$video.playInToOut();
+				//wafaa
+        //self.$video.playInToOut();
     }
 
     function movePositionBy(sec) {
@@ -507,9 +520,10 @@ Ox.VideoPlayerPanel = function(options, self) {
     function resizeAnnotations(data) {
         // called on annotations resize
         self.options.annotationsSize = data.size;
-        self.$video.options({
+				//wafaa
+        /*self.$video.options({
             width: getPlayerWidth()
-        });
+        });*/
         /*wafaa
 				self.$timeline.options({
             width: getTimelineWidth()
@@ -524,9 +538,11 @@ Ox.VideoPlayerPanel = function(options, self) {
     function resizeElement(data) {
         // called on browser toggle
         self.options.height = data.size;
-        self.$video.options({
+        //wafaa
+				/*
+				self.$video.options({
             height: getPlayerHeight()
-        });
+        });*/
     }
 
     /*
@@ -575,7 +591,8 @@ Ox.VideoPlayerPanel = function(options, self) {
         if (self.options.selected && !keepSelected) {
             selectAnnotation({id: ''});
         }
-        self.$video.options(point, position);
+        //wafaa
+				//self.$video.options(point, position);
         /*wafaa
 				self.$timeline.options(point, position);
 				*/
@@ -595,7 +612,8 @@ Ox.VideoPlayerPanel = function(options, self) {
         var minute = Math.floor(position / 60),
             previousMinute = Math.floor(self.options.position / 60);
         self.options.position = position;
-        !playing && self.$video.options({position: self.options.position});
+        //wafaa
+				//!playing && self.$video.options({position: self.options.position});
         //wafaa
 				/*self.$timeline.options({position: self.options.position});*/
         self.$annotationPanel.options({position: self.options.position});
@@ -626,9 +644,10 @@ Ox.VideoPlayerPanel = function(options, self) {
 
     function toggleAnnotations(data) {
         self.options.showAnnotations = !data.collapsed;
-        self.$video.options({
+        //wafaa
+				/*self.$video.options({
             width: getPlayerWidth()
-        });
+        });*/
         /*wafaa
 				self.$timeline.options({
             width: getTimelineWidth()
@@ -639,26 +658,31 @@ Ox.VideoPlayerPanel = function(options, self) {
     }
     function toggleControls(data) {
         self.options.showTimeline = !data.collapsed;
-        self.$video.options({
+        //wafaa
+				/*self.$video.options({
             height: getPlayerHeight()
-        });
+        });*/
         that.triggerEvent('toggletimeline', {
             showTimeline: self.options.showTimeline
         });
     }
     function toggleLoop() {
-        self.$video.toggleLoop();
+				//wafaa
+        //self.$video.toggleLoop();
     }
 
     function toggleMuted() {
-        self.$video.toggleMuted();
+				//wafaa
+        //self.$video.toggleMuted();
     }
 
     function togglePaused() {
-        self.$video.togglePaused();
-        self.$video.options('paused') && that.triggerEvent('position', {
-            position: self.$video.options('position')
-        });
+				//wafaa
+        //self.$video.togglePaused();
+        //self.$video.options('paused') && that.triggerEvent('position', {
+						//wafaa
+            //position: self.$video.options('position')
+        //});
     }
 
     // fixme: can these be removed?
