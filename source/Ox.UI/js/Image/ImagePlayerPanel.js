@@ -210,25 +210,17 @@ Ox.VideoPlayerPanel = function(options, self) {
     self.$player = Ox.Element().css({overflow: 'hidden'});
 		/*wafaa*/
 		//if (self.options.video) {
-		$('<div class="ImgControls"><button id="btn_240" style="border-radius: 50px; border: 1px solid #000;">Low Resolution 240px</button><button id="btn_480" style="border-radius: 50px; border: 1px solid #000;">High Resolution 480px</button></div>').appendTo(self.$player);
+		var controls = $('<div class="ImgControls"></div>').appendTo(self.$player);
 		var ImgPanel = $('<div class="ImgPanel"></div>').appendTo(self.$player);
-			$('<img>').attr({src:self.options.video['240']['0'].src}).attr({id: 'defaultimg240', height: '96'}).appendTo(ImgPanel).show();
-			$('<img>').attr({src:self.options.video['240']['0'].src}).attr({id: 'img240'}).appendTo(ImgPanel).hide();
-			$('<img>').attr({src:self.options.video['480']['0'].src}).attr({id: 'img480'}).appendTo(ImgPanel).hide();
-
-			//$('<div class="ImgPanel"></div>').appendTo(self.$player);
-			$(document).on('click','#btn_240',function(){
-				$('img#defaultimg240').hide();
-				$('img#img480').hide();
-				$('img#img240').show();							
-			});			
-			$(document).on('click','#btn_480',function(){
-				$('img#defaultimg240').hide();
-				$('img#img240').hide();
-				$('img#img480').show();							
-			});			
-			//}
-		/*console.log(self.options.video['240']['0']['src']);*/
+		$('<img>').attr({src:self.options.video[self.options.resolution]['0'].src}).attr({id: 'defaultimg240'}).appendTo(ImgPanel).show();
+		Ox.forEach(self.options.video, function(url, resolution) {
+			var len = Object.keys(self.options.video).length;
+			$('<button>').css({"border-radius": "50px", "border": "1px solid #000"}).addClass('gallerryBtn').attr({id: resolution}).appendTo(controls).html('Resolution: '+resolution);
+		});
+		$(document).on('click','.gallerryBtn',function(){
+			$(".ImgPanel").empty();
+			var img = $('<img>').attr({src:self.options.video[this.id]['0'].src, id: this.id}).addClass("imgBtn").appendTo(ImgPanel).show();	
+		});	
 		/*wafaa commented*/
     /*self.$video = Ox.VideoPlayer({
             annotations: getAnnotations(),
