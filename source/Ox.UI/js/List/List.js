@@ -159,7 +159,6 @@ Ox.List = function(options, self) {
     });
     self.options.draggable && updateDraggable();
     self.options.sortable && updateSortable();
-
     // fixme: without this, horizontal lists don't get their full width
     self.options.orientation == 'horizontal' && that.$content.css({height: '1px'});
 
@@ -294,7 +293,6 @@ Ox.List = function(options, self) {
             scrollToPosition(pos);
         }
     }
-
     function addAllToSelection(pos) {
         var arr, i, len = self.$items.length;
         if (!isSelected(pos)) {
@@ -804,7 +802,6 @@ Ox.List = function(options, self) {
         }
         return $element.is('.OxSpecialTarget');
     }
-
     function loadItems() {
         self.$pages[0].empty();
         self.$items = [];
