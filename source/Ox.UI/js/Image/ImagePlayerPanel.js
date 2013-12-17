@@ -218,8 +218,15 @@ Ox.VideoPlayerPanel = function(options, self) {
 			$('<button>').css({"border-radius": "50px", "border": "1px solid #000"}).addClass('gallerryBtn').attr({id: resolution}).appendTo(controls).html('Resolution: '+resolution);
 		});
 		$(document).on('click','.gallerryBtn',function(){
+			if (this.id == '720') {
+				$('.ImgPanel').css({"overflow-x": "scroll", "overflow-y": "scroll", "height": "450px", "width": "852px"});
+			} else if (this.id == '480') {
+				$('.ImgPanel').css({"overflow-x": "scroll", "overflow-y": "scroll", "height": "450px", "width": "auto"});
+			} else {
+				$('.ImgPanel').css({"overflow-x": "hidden", "overflow-y": "hidden"});
+			}
 			$(".ImgPanel").empty();
-			var img = $('<img>').attr({src:self.options.video[this.id]['0'].src, id: this.id}).addClass("imgBtn").appendTo(ImgPanel).show();	
+			var img = $('<img>').attr({src:self.options.video[this.id]['0'].src, id: this.id}).addClass("BtnImg").appendTo(ImgPanel).show();	
 		});	
 		/*wafaa commented*/
     /*self.$video = Ox.VideoPlayer({
