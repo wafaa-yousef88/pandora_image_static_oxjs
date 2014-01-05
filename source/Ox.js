@@ -9,11 +9,13 @@
             var args = arguments,
                 callback = args[args.length - 1],
                 path = getPath(),
+                regexp = /dev\/$/,
                 time = +new Date();
 
-            if (args[0] === true) {
-                path = path.replace(/dev\/$/, 'build/');
+            if (args[0] === true && regexp.test(path)) {
+                path = path.replace(regexp, 'build/');
                 loadScript('Ox.js', function() {
+                    Ox.MODE = 'build';
                     Ox.PATH = path;
                     Ox.load.apply(null, Ox.slice(args, 1));
                 });
@@ -23,7 +25,6 @@
                     loadScriptsSerial(data.files, function() {
                         Ox.LOCALES = data.locales;
                         Ox.VERSION = data.version;
-                        Ox.DEBUG = true;
                         Ox.forEach(previousOx, function(value, key) {
                             if (Ox.isUndefined(Ox[key])) {
                                 Ox[key] = value;
@@ -35,13 +36,14 @@
             }
 
             function getPath() {
-                var i, path, scripts = document.getElementsByTagName('script');
-                for (i = 0; i < scripts.length; i++) {
-                    if (/Ox\.js(\?\d+|)$/.test(scripts[i].src)) {
-                        path = scripts[i].src.replace(/Ox\.js(\?\d+|)$/, '');
+                var index, regexp = /Ox\.js(\?\d+|)$/,
+                    scripts = document.getElementsByTagName('script'), src;
+                for (index = scripts.length - 1; index >= 0; index--) {
+                    src = scripts[index].src;
+                    if (regexp.test(src)) {
+                        return src.replace(regexp, '');
                     }
                 }
-                return path;
             }
 
             function loadJSON(callback) {
@@ -57,6 +59,34 @@
                 request.send();
             }
 
+            function loadScript(script, callback) {
+                var element = document.createElement('script'),
+                    head = document.head
+                        || document.getElementsByTagName('head')[0]
+                        || document.documentElement;
+                element.onload = element.onreadystatechange = function() {
+                    if (
+                        !this.readyState
+                        || this.readyState == 'loaded'
+                        || this.readyState == 'complete'
+                    ) {
+                        callback();
+                    }
+                }
+                element.src = path + script + '?' + time;
+                element.type = 'text/javascript';
+                head.appendChild(element);
+            }
+
+            function loadScriptsParallel(scripts, callback) {
+                var i = 0, n = scripts.length;
+                while (scripts.length) {
+                    loadScript(scripts.shift(), function() {
+                        ++i == n && callback();
+                    });
+                }
+            }
+
             function loadScriptsSerial(scripts, callback) {
                 loadScriptsParallel(scripts.shift(), function() {
                     if (scripts.length) {
@@ -65,31 +95,6 @@
                         callback();
                     }
                 });
-            }
-
-            function loadScriptsParallel(scripts, callback) {
-                var counter = 0, length = scripts.length;
-                while (scripts.length) {
-                    loadScript(scripts.shift(), function() {
-                        ++counter == length && callback();
-                    });
-                }
-            }
-
-            function loadScript(script, callback) {
-                var element = document.createElement('script'),
-                    head = document.head
-                        || document.getElementsByTagName('head')[0]
-                        || document.documentElement;
-                if (/MSIE/.test(navigator.userAgent)) {
-                    // FIXME: find a way to check if css/js have loaded in MSIE
-                    setTimeout(callback, 2500);
-                } else {
-                    element.onload = callback;
-                }
-                element.src = path + script + '?' + time;
-                element.type = 'text/javascript';
-                head.appendChild(element);
             }
 
         }

@@ -71,7 +71,7 @@ Ox.MenuItem = function(options, self) {
     }
 
     that.append(
-            that.$status = $('<td>')
+            that.$status = Ox.$('<td>')
                 .addClass('OxCell OxStatus')
                 .html(self.options.checked ? Ox.UI.symbols.check : '')
         )
@@ -80,12 +80,12 @@ Ox.MenuItem = function(options, self) {
                 .addClass('OxCell OxIcon')
                 .append(
                     self.options.icon
-                    ? $('<img>').attr({src: self.options.icon})
+                    ? Ox.$('<img>').attr({src: self.options.icon})
                     : null
                 )
         )
         .append(
-            that.$title = $('<td>')
+            that.$title = Ox.$('<td>')
                 .addClass('OxCell OxTitle')
                 .css(
                     self.options.maxWidth
@@ -110,12 +110,12 @@ Ox.MenuItem = function(options, self) {
                         : (
                             Ox.isString(self.options.title[0])
                                 ? self.options.title[0]
-                                : $('<div>').html(self.options.title[0]).html()
+                                : Ox.$('<div>').html(self.options.title[0]).html()
                         )
                 )
         )
         .append(
-            that.$modifiers = $('<td>')
+            that.$modifiers = Ox.$('<td>')
                 .addClass('OxCell OxModifiers')
                 .html(
                     self.options.keyboard.modifiers.map(function(modifier) {
@@ -124,7 +124,7 @@ Ox.MenuItem = function(options, self) {
                 )
         )
         .append(
-            that.$key = $('<td>')
+            that.$key = Ox.$('<td>')
                 .addClass(
                     'OxCell Ox' + (self.options.items.length ? 'Submenu' : 'Key')
                 )

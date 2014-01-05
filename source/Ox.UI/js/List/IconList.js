@@ -251,25 +251,32 @@ Ox.IconList = function(options, self) {
         (id) -> <o> get all data for item
         (id, key) -> <s> get value of key of item with id
         (id, key, value) -> <f> set value, returns IconList
+        (id, {key: value, ...}) -> <f> set values, returns IconList
     @*/
-    that.value = function(id, key, value) {
-        // fixme: make this accept id, {k: v, ...}
+    that.value = function() {
+        var args = Ox.slice(arguments),
+            id = args.shift(),
+            sort = false;
         if (arguments.length == 1) {
             return that.$element.value(id);
-        } else if (arguments.length == 2) {
-            return that.$element.value(id, key);
+        } else if (arguments.length == 2 && Ox.isString(arguments[1])) {
+            return that.$element.value(id, arguments[1]);
         } else {
-            that.$element.value(id, key, value);
-            if (key == self.unique) {
-                // unique id has changed
-                self.options.selected = self.options.selected.map(function(id_) {
-                    return id_ == id ? value : id_
-                });
-            }
-            if (key == self.options.sort[0].key) {
-                // sort key has changed
-                that.$element.sort();
-            }
+            Ox.forEach(Ox.makeObject(args), function(value, key) {
+                that.$element.value(id, key, value);
+                if (key == self.unique) {
+                    // unique id has changed
+                    self.options.selected = self.options.selected.map(function(id_) {
+                        return id_ == id ? value : id_
+                    });
+                    id = value;
+                }
+                if (key == self.options.sort[0].key) {
+                    // sort key has changed
+                    sort = true;
+                }
+            });
+            sort && that.$element.sort();
             return that;
         }
     };

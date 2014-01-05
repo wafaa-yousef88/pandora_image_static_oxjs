@@ -47,7 +47,7 @@
             n, time, type = Ox.typeOf(collection);
         callback = Ox.isFunction(last) ? last : arguments[arguments.length - 2];
         collection = type == 'array' || type == 'object'
-            ? collection : Ox.toArray(collection);
+            ? collection : Ox.slice(collection);
         keys = type == 'object'
             ? Object.keys(collection) : Ox.range(collection.length);
         ms = ms || 1000;
@@ -149,7 +149,7 @@
         var i = 0, n, type = Ox.typeOf(collection);
         callback = callback || (arguments.length == 3 ? arguments[2] : Ox.noop);
         collection = type == 'array' || type == 'object'
-            ? collection : Ox.toArray(collection);
+            ? collection : Ox.slice(collection);
         n = Ox.len(collection);
         that = arguments.length == 4 ? that : null;
         Ox.forEach(collection, function(value, key, collection) {
@@ -192,7 +192,7 @@
         undefined
     @*/
     Ox.parallelMap = function() {
-        asyncMap.apply(null, [Ox.parallelForEach].concat(Ox.toArray(arguments)));
+        asyncMap.apply(null, [Ox.parallelForEach].concat(Ox.slice(arguments)));
     };
 
     /*@
@@ -222,7 +222,7 @@
         var i = 0, keys, n, type = Ox.typeOf(collection);
         callback = callback || (arguments.length == 3 ? arguments[2] : Ox.noop);
         collection = type == 'array' || type == 'object'
-            ? collection : Ox.toArray(collection);
+            ? collection : Ox.slice(collection);
         keys = type == 'object'
             ? Object.keys(collection) : Ox.range(collection.length);
         n = Ox.len(collection);
@@ -280,7 +280,7 @@
         undefined
     @*/
     Ox.serialMap = function(collection, iterator, that, callback) {
-        asyncMap.apply(null, [Ox.serialForEach].concat(Ox.toArray(arguments)));
+        asyncMap.apply(null, [Ox.serialForEach].concat(Ox.slice(arguments)));
     };
     // FIXME: The above test with 10000 iterations blows the stack
 

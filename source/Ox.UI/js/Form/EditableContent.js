@@ -16,9 +16,9 @@ Ox.EditableContent = function(options, self) {
             editable: true,
             editing: false,
             format: null,
+            globalAttributes: [],
             highlight: null,
             placeholder: '',
-            replaceTags: {},
             submitOnBlur: true,
             tags: null,
             tooltip: '',
@@ -190,7 +190,7 @@ Ox.EditableContent = function(options, self) {
         return (
             self.options.type == 'input'
             ? Ox.encodeHTMLEntities(value)
-            : Ox.sanitizeHTML(value, self.options.tags, self.options.replaceTags)
+            : Ox.sanitizeHTML(value, self.options.tags, self.options.globalAttributes)
         );
     }
 

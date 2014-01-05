@@ -47,7 +47,7 @@ Ox.Label = function(options, self) {
         }, {
             textAlign: self.options.textAlign
         }))
-        .html(self.options.title);
+        .html(Ox.isUndefined(self.options.title) ? '' : self.options.title);
 
     return that;
 

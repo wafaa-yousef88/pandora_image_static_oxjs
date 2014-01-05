@@ -31,7 +31,7 @@ Ox.InputGroup = function(options, self) {
             value: setValue
         })
         .addClass('OxInputGroup')
-        .click(click);
+        .on({click: click});
 
     if (Ox.isEmpty(self.options.value)) {
         self.options.value = getValue();

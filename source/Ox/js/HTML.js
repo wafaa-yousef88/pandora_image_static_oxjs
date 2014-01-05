@@ -4,19 +4,80 @@
 
     var defaultTags = [
             // inline formatting
-            'b', 'bdi', 'code', 'em', 'i', 'q', 's', 'span', 'strong', 'sub', 'sup', 'u',
+             {'name': 'b'},
+             {'name': 'bdi'},
+             {'name': 'code'},
+             {'name': 'em'},
+             {'name': 'i'},
+             {'name': 'q'},
+             {'name': 's'},
+             {'name': 'span'},
+             {'name': 'strong'},
+             {'name': 'sub'},
+             {'name': 'sup'},
+             {'name': 'u'},
             // block formatting
-            'blockquote', 'cite', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre',
+             {'name': 'blockquote'},
+             {'name': 'cite'},
+             {
+                'name': 'div',
+                'optional': ['style'],
+                'validation': {
+                    'style': /^direction: rtl$/
+                }
+             },
+             {'name': 'h1'},
+             {'name': 'h2'},
+             {'name': 'h3'},
+             {'name': 'h4'},
+             {'name': 'h5'},
+             {'name': 'h6'},
+             {'name': 'p'},
+             {'name': 'pre'},
             // lists
-            'li', 'ol', 'ul',
+             {'name': 'li'},
+             {'name': 'ol'},
+             {'name': 'ul'},
             // tables
-            'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
+             {'name': 'table'},
+             {'name': 'tbody'},
+             {'name': 'td'},
+             {'name': 'tfoot'},
+             {'name': 'th'},
+             {'name': 'thead'},
+             {'name': 'tr'},
             // other
-            'a', 'br', 'img', 'figure', 'figcaption',
-            // iframe
-            'iframe',
-            // special
-            'rtl', '[]'
+             {'name': '[]'},
+             {
+                'name': 'a',
+                'required': ['href'],
+                'validation': {
+                    'href': /^((https?:\/\/|\/|mailto:).*?)/
+                }
+             },
+             {'name': 'br'},
+             {
+                'name': 'iframe',
+                'optional': ['width', 'height'],
+                'required': ['src'],
+                'validation': {
+                    'width': /^\d+$/,
+                    'height': /^\d+$/,
+                    'src': /^((https?:\/\/|\/|mailto:).*?)/
+                }
+             },
+             {
+                'name': 'img',
+                'optional': ['width', 'height'],
+                'required': ['src'],
+                'validation': {
+                    'width': /^\d+$/,
+                    'height': /^\d+$/,
+                    'src': /^((https?:\/\/|\/|mailto:).*?)/
+                },
+             },
+             {'name': 'figure'},
+             {'name': 'figcaption'}
         ],
         htmlEntities = {
             '"': '&quot;', '&': '&amp;', "'": '&apos;', '<': '&lt;', '>': '&gt;'
@@ -27,56 +88,6 @@
             tag: new RegExp('<\\/?(' + [
                 'a', 'b', 'br', 'code', 'i', 's', 'span', 'u'
             ].join('|') + ')\\/?>', 'gi')
-        },
-        replace = {
-            a: [
-                [
-                    /<a [^<>]*?href="((\/|https?:\/\/|mailto:).*?)".*?>/gi,
-                    '<a href="{1}">',
-                ],
-                [
-                    /<\/a>/gi,
-                    '</a>'
-                ]
-            ],
-            img: [
-                [
-                    /<img [^<>]*?src="((\/|https?:\/\/).+?)".*?>/gi,
-                    '<img src="{1}">'
-                ]
-            ],
-            iframe: [
-                [
-                    /<iframe [^<>]*?width="(\d+)" height="(\d+)"[^<>]*?src="((\/|https?:\/\/).+?)".*?>/gi,
-                    '<iframe width="{1}" height="{2}" src="{3}">'
-                ],
-                [
-                    /<iframe [^<>]*?src="((\/|https?:\/\/).+?)".*?>/gi,
-                    '<iframe src="{1}">'
-                ],
-                [
-                    /<\/iframe>/gi,
-                    '</iframe>'
-                ]
-            ],
-            rtl: [
-                [
-                    /<rtl>/gi,
-                    '<div style="direction: rtl">'
-                ],
-                [
-                    /<\/rtl>/gi,
-                    '</div>'
-                ]
-            ],
-            '*': function(tag) {
-                return [
-                    [
-                        new RegExp('</?' + tag + ' ?/?>', 'gi'),
-                        '{0}'
-                    ]
-                ];
-            }
         },
         salt = Ox.range(2).map(function(){
             return Ox.range(16).map(function() {
@@ -177,8 +188,8 @@
         > Ox.encodeEmailAddress('mailto:foo@bar.com').indexOf(':') > -1
         true
     @*/
-    Ox.encodeEmailAddress = function(string) {
-        var parts = ['mailto:' + string, string].map(function(part) {
+    Ox.encodeEmailAddress = function(address, text) {
+        var parts = ['mailto:' + address, text || address].map(function(part) {
             return Ox.map(part, function(char) {
                 var code = char.charCodeAt(0);
                 return char == ':' ? ':'
@@ -493,16 +504,16 @@
         > Ox.sanitizeHTML('<a href="http://foo.com" onclick="alert()">foo</a>')
         '<a href="http://foo.com">foo</a>'
         > Ox.sanitizeHTML('<a href="javascript:alert()">foo</a>')
-        '&lt;a href="javascript:alert()"&gt;foo'
+        '&lt;a href="javascript:alert()"&gt;foo&lt;/a&gt;'
         > Ox.sanitizeHTML('<a href="foo">foo</a>')
-        '&lt;a href="foo"&gt;foo'
+        '&lt;a href="foo"&gt;foo&lt;/a&gt;'
         > Ox.sanitizeHTML('<a href="/foo">foo</a>')
         '<a href="/foo">foo</a>'
         > Ox.sanitizeHTML('<a href="/">foo</a>')
         '<a href="/">foo</a>'
         > Ox.sanitizeHTML('[http://foo.com foo]')
         '<a href="http://foo.com">foo</a>'
-        > Ox.sanitizeHTML('<rtl>foo</rtl>')
+        > Ox.sanitizeHTML('<div style="direction: rtl">foo</div>')
         '<div style="direction: rtl">foo</div>'
         > Ox.sanitizeHTML('<script>alert()</script>')
         '&lt;script&gt;alert()&lt;/script&gt;'
@@ -516,40 +527,105 @@
         '&amp;&amp;'
         > Ox.sanitizeHTML('<http://foo.com>')
         '&lt;<a href="http://foo.com">http://foo.com</a>&gt;'
+        > Ox.sanitizeHTML('<foo value="http://foo.com"></foo>')
+        '"&lt;foo value="http://foo.com"&gt;&lt;/foo&gt;"'
     @*/
-    Ox.sanitizeHTML = function(html, tags, replaceTags) {
-        var matches = [];
+    Ox.sanitizeHTML = function(html, tags, globalAttributes) {
         tags = tags || defaultTags;
-        replaceTags = replaceTags || {};
+        globalAttributes = globalAttributes || [];
+        var escaped = {},
+            level = 0,
+            matches = [],
+            nonClosingTags = ['img', 'br'],
+            validAttributes = {}, requiredAttributes = {}, validation = {},
+            validTags = tags.map(function(tag) {
+                validAttributes[tag.name]  = globalAttributes
+                    .concat(tag.required || [])
+                    .concat(tag.optional || []);
+                requiredAttributes[tag.name] = tag.required || [];
+                validation[tag.name] = tag.validation || {};
+                return tag.name;
+            });
+
         // html = Ox.clean(html); fixme: can this be a parameter?
-        if (tags.indexOf('[]') > -1) {
+        if (validTags.indexOf('[]') > -1) {
             html = html.replace(
                 /\[((\/|https?:\/\/|mailto:).+?) (.+?)\]/gi,
                 '<a href="$1">$3</a>'
             );
-            tags = tags.filter(function(tag) {
+            validTags = validTags.filter(function(tag) {
                 return tag != '[]';
             });
         }
-        tags.forEach(function(tag) {
-            var array = replaceTags[tag] || replace[tag] || replace['*'](tag);
-            Ox.forEach(array, function(value) {
-                html = html.replace(value[0], function() {
-                    var match;
-                    if (Ox.isFunction(value[1])) {
-                        match = value[1].apply(null, arguments);
-                    } else {
-                        match = Ox.formatString(value[1], arguments);
+
+        html = splitHTMLTags(html).map(function(string, i) {
+            var attributes,
+                attrs = {},
+                attrRegexp = /([^=\ ]+)="([^"]+)"/g,
+                isClosing,
+                isTag = i % 2,
+                isValid = true,
+                name,
+                match,
+                tag,
+                tagRegexp = /<(\/)?([^\ \/]+)(.*?)(\/)?>/g;
+
+            if (isTag) {
+                tag = tagRegexp.exec(string);
+                if (tag) {
+                    isClosing = !Ox.isUndefined(tag[1]);
+                    name = tag[2];
+                    attributes = tag[3].trim();
+                    while(match = attrRegexp.exec(attributes)) {
+                        if (validAttributes[name] && validAttributes[name].indexOf(match[1]) > -1) {
+                            attrs[match[1]] = match[2];
+                        }
                     }
-                    matches.push(match);
-                    return salt.join(matches.length - 1);
-                });
-            });
-        });
-        html = Ox.encodeHTMLEntities(Ox.decodeHTMLEntities(html));
-        matches.forEach(function(match, i) {
-            html = html.replace(new RegExp(salt.join(i)), match);
-        });
+                    if (!isClosing && nonClosingTags.indexOf(name) == -1) {
+                        level++;
+                    }
+                    if (Ox.isEmpty(attrs) && attributes.length || validTags.indexOf(name) == -1) {
+                        isValid = false;
+                    } else if(!isClosing && requiredAttributes[name]) {
+                        requiredAttributes[name].forEach(function(attr) {
+                            if (Ox.isUndefined(attrs[attr])) {
+                                isValid = false;
+                            }
+                        });
+                    }
+                    if (isValid && !Ox.isEmpty(attrs)) {
+                        Ox.forEach(attrs, function(value, key) {
+                            if (!Ox.isUndefined(validation[name][key])
+                                && !validation[name][key].exec(value)) {
+                                isValid = false;
+                                return false;
+                            }
+                        });
+                    }
+                    if (isValid && isClosing) {
+                        isValid = !escaped[level];
+                    } else {
+                        escaped[level] = !isValid;
+                    }
+                    if (isClosing) {
+                        level --;
+                    }
+                    if (isValid) {
+                        return '<'
+                            + (isClosing ? '/' : '')
+                            + name
+                            + (!isClosing && !Ox.isEmpty(attrs)
+                                ? ' ' + Ox.values(Ox.map(attrs, function(value, key) {
+                                    return key + '="' + value + '"';
+                                })).join(' ')
+                                : '')
+                            + '>';
+                    }
+                }
+            }
+            return Ox.encodeHTMLEntities(Ox.decodeHTMLEntities(string));
+        }).join('');
+        //FIXME: dont add links to urls inside of escaped tags
         html = Ox.addLinks(html, true);
         html = html.replace(/\n\n/g, '<br/><br/>');
         // Close extra opening and remove extra closing tags.

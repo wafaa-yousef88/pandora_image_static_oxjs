@@ -21,8 +21,10 @@ Ox.MainMenu = function(options, self) {
             })
             .options(options || {})
             .addClass('OxMainMenu Ox' + Ox.toTitleCase(self.options.size)) // fixme: bar should accept small/medium/large ... like toolbar
-            .click(click)
-            .mousemove(mousemove);
+            .on({
+                click: click,
+                mousemove: mousemove
+            });
 
     self.focused = false;
     self.selected = -1;
@@ -47,7 +49,7 @@ Ox.MainMenu = function(options, self) {
         that.titles[position] = $('<div>')
             .addClass('OxTitle')
             .html(menu.title)
-            .data('position', position);
+            .data({position: position});
         if (position == 0) {
             if (that.titles.length == 1) {
                 that.titles[position].appendTo(that);

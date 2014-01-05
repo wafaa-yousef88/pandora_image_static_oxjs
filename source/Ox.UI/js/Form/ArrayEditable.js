@@ -27,6 +27,7 @@ Ox.ArrayEditable = function(options, self) {
             clickLink: null,
             editable: true,
             getSortValue: null,
+            globalAttributes: [],
             highlight: '',
             itemName: 'item',
             items: [],
@@ -163,6 +164,7 @@ Ox.ArrayEditable = function(options, self) {
                             return value || '&nbsp;'
                         },
                         */
+                        globalAttributes: self.options.globalAttributes,
                         highlight: self.options.highlight,
                         maxHeight: self.options.maxHeight,
                         submitOnBlur: self.options.submitOnBlur,

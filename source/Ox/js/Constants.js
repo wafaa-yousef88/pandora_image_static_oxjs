@@ -17,11 +17,11 @@ Ox.EARTH_RADIUS = 6378137;
 Ox.EARTH_CIRCUMFERENCE = 2 * Math.PI * Ox.EARTH_RADIUS;
 //@ Ox.EARTH_SURFACE <n> Surface of the earth in square meters
 Ox.EARTH_SURFACE = 4 * Math.PI * Math.pow(Ox.EARTH_RADIUS, 2);
-//@ Ox.HTML_ENTITIES <object> HTML entities for ... (FIXME)
+//@ Ox.HTML_ENTITIES <o> HTML entities for ... (FIXME)
 Ox.HTML_ENTITIES = {
     '"': '&quot;', '&': '&amp;', "'": '&apos;', '<': '&lt;', '>': '&gt;'
 };
-//@ Ox.KEYS <object> Names for key codes
+//@ Ox.KEYS <o> Names for key codes
 // The dot notation ('0.numpad') allows for namespaced events ('key_0.numpad'),
 // so that binding to 'key_0' will catch both 'key_0' and 'key_0.numpad'.
 Ox.KEYS = {
@@ -59,9 +59,10 @@ Ox.LOCALE = 'en';
 //@ Ox.LOCALE_NAMES <o> Locale names
 Ox.LOCALE_NAMES = {
     'ar': 'العربية',
-    'de': 'Deutsch',
+//    'de': 'Deutsch',
     'en': 'English',
-    'fr': 'Français'
+//    'fr': 'Français',
+    'hi': 'हिंदी'
 };
 //@ Ox.LOCALES <o> Locales per module
 Ox.LOCALES = {};
@@ -83,16 +84,24 @@ Ox.MONTHS = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
 ];
-//@ Ox.SHORT_MONTHS <[str]> Short names of months
+//@ Ox.SHORT_MONTHS <[s]> Short names of months
 Ox.SHORT_MONTHS = Ox.MONTHS.map(function(val) {
     return val.slice(0, 3);
 });
-//@ Ox.PATH <str> Path of Ox.js
-Ox.PATH = Ox.toArray(
-    document.getElementsByTagName('script')
-).reverse().filter(function(element) {
-    return /Ox\.js(\?\d+|)$/.test(element.src);
-})[0].src.replace(/Ox\.js(\?\d+|)$/, '');
+//@ Ox.PATH <s> Path of Ox.js
+Ox.PATH = (function() {
+    // IE8 can't apply slice to NodeLists, see Ox.slice
+    var index, regexp = /Ox\.js(\?\d+|)$/,
+        scripts = document.getElementsByTagName('script'), src;
+    for (index = scripts.length - 1; index >= 0; index--) {
+        src = scripts[index].src;
+        if (regexp.test(src)) {
+            return src.replace(regexp, '');
+        }
+    }
+}());
+//@ Ox.MODE <s> Mode ('build' or 'dev')
+Ox.MODE = Ox.PATH.slice(0, -1).split('/').pop();
 //@ Ox.PREFIXES <[str]> `['', 'K', 'M', 'G', 'T', 'P']`
 Ox.PREFIXES = ['', 'K', 'M', 'G', 'T', 'P'];
 //@ Ox.SEASONS <[s]> Names of the seasons of the year
@@ -116,7 +125,7 @@ Ox.SYMBOLS = {
     REDO: '\u21BA', UNDO: '\u21BB', PAGEUP: '\u21DE', PAGEDOWN: '\u21DF',
     CAPSLOCK: '\u21EA', TAB: '\u21E5', SHIFT: '\u21E7', INFINITY: '\u221E',
     CONTROL: '\u2303', COMMAND: '\u2318', ENTER: '\u2324', ALT: '\u2325',
-    DELETE: '\u2326', CLEAR:'\u2327',BACKSPACE: '\u232B', OPTION: '\u2387',
+    DELETE: '\u2326', CLEAR:'\u2327', BACKSPACE: '\u232B', OPTION: '\u2387',
     NAVIGATE: '\u2388', ESCAPE: '\u238B', EJECT: '\u23CF',
     SPACE: '\u2423', DIAMOND: '\u25C6',
     STAR: '\u2605', SOUND: '\u266B', TRASH: '\u267A', FLAG: '\u2691',

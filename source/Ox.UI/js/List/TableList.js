@@ -1215,31 +1215,37 @@ Ox.TableList = function(options, self) {
         (id) -> get values of row id
         (id, key) -> get value of cell id, key
         (id, key, value) -> set id, key to value
+        (id, {key: value, ...}) -> set id, keys to values
     @*/
-    that.value = function(id, key, value) {
-        // fixme: make this accept id, {k: v, ...}
-        var $cell;
+    that.value = function() {
+        var $cell,
+            args = Ox.slice(arguments),
+            id = args.shift(),
+            sort = false;
         if (arguments.length == 1) {
             return that.$body.value(id);
-        } else if (arguments.length == 2) {
-            return that.$body.value(id, key);
+        } else if (arguments.length == 2 && Ox.isString(arguments[1])) {
+            return that.$body.value(id, arguments[1]);
         } else {
-            that.$body.value(id, key, value);
-            if (key == self.options.unique) {
-                // unique id has changed
-                self.options.selected = self.options.selected.map(function(id_) {
-                    return id_ == id ? value : id_
-                });
-                id = value;
-            }
-            $cell = getCell(id, key);
-            if ($cell && !$cell.is('.OxEdit')) {
-                $cell.html(formatValue(key, value, that.$body.value(id)));
-            }
-            if (!self.options.sortable && key == self.options.sort[0].key) {
-                // sort key has changed
-                that.$body.sort();
-            }
+            Ox.forEach(Ox.makeObject(args), function(value, key) {
+                that.$body.value(id, key, value);
+                if (key == self.options.unique) {
+                    // unique id has changed
+                    self.options.selected = self.options.selected.map(function(id_) {
+                        return id_ == id ? value : id_
+                    });
+                    id = value;
+                }
+                $cell = getCell(id, key);
+                if ($cell && !$cell.is('.OxEdit')) {
+                    $cell.html(formatValue(key, value, that.$body.value(id)));
+                }
+                if (!self.options.sortable && key == self.options.sort[0].key) {
+                    // sort key has changed
+                    sort = true;
+                }
+            });
+            sort && that.$body.sort();
             return that;
         }
     };

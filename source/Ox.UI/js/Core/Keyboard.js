@@ -31,6 +31,7 @@ Ox.Keyboard = (function() {
             }
         });
         key = keyNames.join('_');
+        // If no input element has focus, invoke global handlers
         if (
             focused === null || (
                 !$focused.hasClass('OxInput')
@@ -50,6 +51,7 @@ Ox.Keyboard = (function() {
                 event.preventDefault();
             }
         }
+        // If the focused element is not bound globally, invoke element handlers
         if (focused !== null && bound.indexOf(focused) == -1) {
             $focused.triggerEvent('key_' + key);
             // prevent Chrome from scrolling, or going back in history

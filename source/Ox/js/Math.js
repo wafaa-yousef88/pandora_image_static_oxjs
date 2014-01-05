@@ -58,9 +58,10 @@ Ox.hypot <f> Returns the square root of the sum of the squares of its arguments
     > Ox.hypot(1, 1, 1)
     Math.sqrt(3)
 @*/
-Ox.hypot = function(x, y, z) {
-    z = z || 0;
-    return Math.sqrt(x * x + y * y + z * z) || 0;
+Ox.hypot = function() {
+    return Math.sqrt(Ox.slice(arguments).reduce(function(sum, number) {
+        return sum + number * number;
+    }, 0));
 };
 
 /*@

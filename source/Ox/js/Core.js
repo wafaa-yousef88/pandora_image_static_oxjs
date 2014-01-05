@@ -13,21 +13,42 @@ this.Ox = function(value) {
 };
 
 /*@
-Ox.load <f> Loads one or more modules
-    A module named "Foo" provides `Ox.Foo/Ox.Foo.js`, in which it defines one
+Ox.load <f> Loads OxJS and, optionally, one or more modules
+    To load OxJS, include `/build/Ox.js` (minified version) or `/dev/Ox.js`
+    (development version), and use `Ox.load(callback)` at the beginning of your
+    program. The callback will run once OxJS is loaded and the document is
+    ready. To choose the version programatically (for example: minified version
+    on production server, development version on localhost), include the
+    development version and pass `true` as a first parameter to `Ox.load` in
+    case you want to switch to the minified version. To load one or more
+    modules, either at the beginning or at a later point, use<br>
+    <br>
+    <ul><li>`Ox.load(module, callback)` (one module),</li>
+    <li>`Ox.load(module, options, callback)` (one module with options),</li>
+    <li>`Ox.load(['moduleA', 'moduleB', ...], callback)` (multiple modules)</li>
+    <li>`Ox.load({moduleA: optionsA, moduleB: optionsB, ...}, callback)` (multiple
+    modules with options) or either</li>
+    <li>`Ox.load(['moduleA', {moduleB: optionsB}, ...], callback)` or
+    `Ox.load({moduleA: {}, moduleB: optionsB, ...}, callback)` (multiple modules
+    without and with options).</li></ul>
+    <br>
+    A module named 'Foo' provides `Ox.Foo/Ox.Foo.js`, in which it defines one
     method, `Ox.load.Foo`, that takes two arguments, `options` and `callback`,
     and calls `callback` with one argument, `true` for success or `false` if an
-    error occurred. Generally, the module should define `Ox.Foo` and attach its
+    error occurred. A third-party module should define `Ox.Foo` and attach its
     own methods there.
-    (callback) -> <u> undefined
-    (module, callback) -> <u> undefined
-    (module, options, callback) -> <u> undefined
-    (modules, callback) -> <u> undefined
-    module   <s> Module name
-    options  <o> Module options
-    modules  <a|o> Multiple modules
-        Either `['moduleA', {moduleB: options}, ...]`
-        or `{moduleA: {}, moduleB: options, ...}`
+    ([min ,]callback) -> <u> undefined
+    ([min ,]module, callback) -> <u> undefined
+    ([min ,]module, options, callback) -> <u> undefined
+    ([min ,]modules, callback) -> <u> undefined
+    min <b> If true, switch from development version to minified version
+    module <s> Module name
+    options <o> Module options
+    modules <a|o> Multiple modules
+        `['moduleA', 'moduleB']` (without options) or
+        `{moduleA: optionsA, moduleB: optionsB, ...}` (with options) or either
+        `['moduleA', {moduleB: optionsB}, ...]` or
+        `{moduleA: {}, moduleB: optionsB, ...}` (without and with options)
     callback <f> Callback function
         success <b> If true, all modules have been loaded successfully
 @*/
@@ -44,7 +65,7 @@ Ox.load = function() {
             if (Ox.isString(value)) {
                 modules[value] = {};
             } else {
-                Ox.extend(modules, value)
+                Ox.extend(modules, value);
             }
         });
     } else if (type == 'object') {
@@ -123,7 +144,7 @@ Ox.localStorage = function(namespace) {
     // IE 8 doesn't like `storage.delete`
     storage['delete'] = function() {
         var keys = arguments.length == 0 ? Object.keys(storage())
-            : Ox.toArray(arguments)
+            : Ox.slice(arguments)
         keys.forEach(function(key) {
             delete localStorage[namespace + '.' + key];
         });
@@ -173,7 +194,7 @@ Ox.Log = (function() {
         }));
     };
     that.log = function() {
-        var args = Ox.toArray(arguments), date, ret;
+        var args = Ox.slice(arguments), date, ret;
         if (!log.filterEnabled || log.filter.indexOf(args[0]) > -1) {
             date = new Date();
             args.unshift(
@@ -233,13 +254,13 @@ Ox.print <f> Prints its arguments to the console
         The string contains the timestamp, the name of the caller function, and
         any arguments, separated by spaces
     arg <*> any value
-    > Ox.print('foo').split(' ').pop()
-    "foo"
+    > Ox.print('foo', 'bar').split(' ').slice(1).join(' ')
+    'foo bar'
 @*/
 Ox.print = function() {
-    var args = Ox.toArray(arguments), date = new Date();
+    var args = Ox.slice(arguments), date = new Date();
     args.unshift(
-        Ox.formatDate(date, '%H:%M:%S.') + (+date).toString().slice(-3)
+        date.toString().split(' ')[4] + '.' + (+date).toString().slice(-3)
     );
     window.console && window.console.log.apply(window.console, args);
     return args.join(' ');
@@ -254,7 +275,7 @@ Ox.uid <f> Returns a unique id
 Ox.uid = (function() {
     var uid = 0;
     return function() {
-        return uid++;
+        return ++uid;
     };
 }());
 

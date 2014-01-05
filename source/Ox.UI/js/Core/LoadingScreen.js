@@ -35,11 +35,8 @@ Ox.LoadingScreen = function(options, self) {
 
     setSizes();
 
-    $('<img>')
-        .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
-        .css({
-            width: self.options.size + 'px',
-            height: self.options.size + 'px'
+    self.$loadingIcon = Ox.LoadingIcon({
+            size: self.options.size
         })
         .appendTo(self.$box);
 
@@ -67,6 +64,18 @@ Ox.LoadingScreen = function(options, self) {
         });
         self.$box.css(css);
     }
+
+    that.start = function(callback) {
+        self.$loadingIcon.start(callback);
+        self.$text && self.$text.stop().animate({opacity: 1}, 250);
+        return that;
+    };
+
+    that.stop = function(callback) {
+        self.$loadingIcon.stop(callback);
+        self.$text && self.$text.stop().animate({opacity: 0}, 250);
+        return that;
+    };
 
     return that;
 

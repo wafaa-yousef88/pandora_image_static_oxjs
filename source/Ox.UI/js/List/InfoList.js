@@ -266,15 +266,19 @@ Ox.InfoList = function(options, self) {
         (id)             -> values
         (id, key)        -> value
         (id, key, value) -> <o>
+        (id, {key: value}) -> <o>
     @*/
-    that.value = function(id, key, value) {
-        // fixme: make this accept id, {k: v, ...}
+    that.value = function() {
+        var args = Ox.slice(arguments),
+            id = args.shift();
         if (arguments.length == 1) {
             return that.$element.value(id);
-        } else if (arguments.length == 2) {
+        } else if (arguments.length == 2 && Ox.isString(arguments[1])) {
             return that.$element.value(id, key);
         } else {
-            that.$element.value(id, key, value);
+            Ox.forEach(Ox.makeObject(args), function(value, key) {
+                that.$element.value(id, key, value);
+            });
             return that;
         }
     };

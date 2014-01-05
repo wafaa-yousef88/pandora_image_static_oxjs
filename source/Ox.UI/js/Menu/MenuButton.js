@@ -66,7 +66,7 @@ Ox.MenuButton = function(options, self) {
         });
 
     if (self.options.type == 'text') {
-        self.$title = $('<div>')
+        self.$title = Ox.$('<div>')
             .addClass('OxTitle')
             .css({width: self.options.width - 24 + 'px'})
             .html(self.options.title)

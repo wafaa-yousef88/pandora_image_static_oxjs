@@ -6,14 +6,16 @@ Ox.extend <function> Extends an object with one or more other objects
     {a: 1, b: 2, c: 3}
     > Ox.extend({a: 1}, 'b', 2)
     {a: 1, b: 2}
+    > Ox.extend({a: 1}, 'b')
+    {a: 1, b: void 0}
 @*/
 Ox.extend = function(object) {
     var args = Ox.slice(arguments, 1);
-    if (args.length == 2 && !Ox.isObject(args[0])) {
+    if (!Ox.isObject(args[0])) {
         args = [Ox.makeObject(args)];
     }
-    Ox.forEach(args, function(argument, i) {
-        Ox.forEach(argument, function(value, key) {
+    Ox.forEach(args, function(arg, i) {
+        Ox.forEach(arg, function(value, key) {
             object[key] = value;
         });
     });
@@ -118,10 +120,10 @@ Ox.makeObject <f> Takes an array and returns an object
 Ox.makeObject = function(array) {
     var ret = {};
     if (Ox.isObject(array[0])) {
-        // ({foo: 'bar'})
+        // [{foo: 'bar'}]
         ret = array[0];
     } else if (array.length) {
-        // ('foo', 'bar')
+        // ['foo', 'bar']
         ret[array[0]] = array[1];
     }
     return ret;

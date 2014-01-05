@@ -18,7 +18,7 @@ Ox.hsl <f> Takes RGB values and returns HSL values
 Ox.hsl = function(rgb) {
     var hsl = [0, 0, 0], max, min;
     if (arguments.length == 3) {
-        rgb = Ox.toArray(arguments);
+        rgb = Ox.slice(arguments);
     }
     rgb = Ox.clone(rgb).map(function(value) {
         return value / 255;
@@ -65,7 +65,7 @@ Ox.rgb <f> Takes HSL values and returns RGB values
 Ox.rgb = function(hsl) {
     var rgb = [0, 0, 0], v1, v2, v3;
     if (arguments.length == 3) {
-        hsl = Ox.toArray(arguments);
+        hsl = Ox.slice(arguments);
     }
     hsl = Ox.clone(hsl);
     hsl[0] /= 360;

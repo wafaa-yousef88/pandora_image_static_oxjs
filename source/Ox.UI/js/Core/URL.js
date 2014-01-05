@@ -516,7 +516,7 @@ Ox.URL = function(options) {
                 : spanType == 'duration' ? constructDuration(point)
                 : spanType == 'location' ? constructLocation(point)
                 : point
-            ) : point;
+            ) : encodeValue(point, true);
         }).join(',');
     }
 
@@ -828,13 +828,15 @@ Ox.URL = function(options) {
                 // item view
                 state.view = parts[0];
                 parts.shift();
+            } else if (state.item && self.options.views[state.type].item.length == 1) {
+                state.view = self.options.views[state.type].item[0];
             }
             if (parts.length) {
+                spanTypes = self.options.spanType[state.type][
+                    !state.item ? 'list' : 'item'
+                ];
                 if (isNumericalSpan(parts[0])) {
                     // test for numerical span
-                    spanTypes = self.options.spanType[state.type][
-                        !state.item ? 'list' : 'item'
-                    ];
                     // if no view is given then parse the span anyway,
                     // but make sure the span type could match a view
                     spanType = state.view
@@ -864,11 +866,13 @@ Ox.URL = function(options) {
                         }
                     }
                 }
-                if (state.span && spanType == 'duration') {
-                    // test duration, may modify state.span
+                if (state.span && (spanType == 'duration' || spanType == 'string')) {
+                    // test duration or numerical string, may modify state.span
                     self.options.getSpan(state, state.span, parseBeyondSpan);
-                } else if (!state.span && /^[A-Z@]/.test(parts[0])) {
-                    // test for span id or name
+                } else if (!state.span && (
+                    spanTypes[state.view] == 'string' || /^[A-Z@]/.test(parts[0])
+                )) {
+                    // test for string or span id or name
                     self.options.getSpan(state, decodeValue(parts[0]), function() {
                         // may have modified state.view and state.span
                         if (state.span) {

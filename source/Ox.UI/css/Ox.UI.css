@@ -699,6 +699,9 @@ input[type=image] {
     width: 10px;
     padding: 2px;
 }
+input[type=image].OxOverlay {
+    padding: 1px;
+}
 
 input::-moz-focus-inner {
     border: none;
@@ -747,6 +750,9 @@ OxButton
     border-style: solid;
     text-align: center;
 }
+.OxButton.OxOverlay {
+    border-width: 2px;
+}
 .OxButton.OxSymbol,
 .OxButton.OxSymbol:active,
 .OxButton.OxSymbol:focus {
@@ -773,6 +779,9 @@ OxButtonGroup
 }
 .OxButtonGroup > .OxButton:last-child {
     border-right-width: 1px;
+}
+.OxButtonGroup > .OxButton.OxOverlay:last-child {
+    border-right-width: 2px;
 }
 .OxButtonGroup > .OxButton.OxLarge:first-child {
     border-top-left-radius: 6px;
@@ -975,6 +984,12 @@ OxEditableElement
     border: none;
     overflow: hidden;
     max-width: 100%;
+}
+.OxValue p, .OxEditableContent p {
+    clear: both;
+}
+.OxEditableContent *[lang=hi], .OxValue *[lang=hi] {
+    font-size: 14px;
 }
 
 /*
@@ -1271,6 +1286,72 @@ Images
     -o-transform: scaleY(-1);
     -webkit-transform: scaleY(-1);
     transform: scaleY(-1);
+}
+
+/*
+================================================================================
+ImageViewer
+================================================================================
+*/
+
+.OxImageViewer {
+    overflow: hidden;
+}
+
+.OxImageViewer .OxInterface {
+    position: absolute;
+}
+
+.OxImageViewer .OxScaleButton {
+    right: 52px;
+    top: 4px;
+}
+.OxImageViewer .OxZoomButton {
+    right: 4px;
+    top: 4px;
+}
+
+.OxImageViewer .OxImage {
+    position: absolute;
+    cursor: move;
+}
+
+
+.OxImageViewer .OxImageOverview {
+    border-width: 2px;
+    border-style: solid;
+    right: 4px;
+    bottom: 4px;
+    overflow: hidden;
+}
+.OxImageViewer .OxImageOverlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.OxImageViewer .OxImageOverlayArea {
+    position: absolute;
+}
+.OxImageViewer #OxImageOverlayCenter {
+    border-width: 2px;
+    border-style: solid;
+    cursor: move;
+}
+.OxImageViewer #OxImageOverlayBottom {
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.OxImageViewer #OxImageOverlayLeft {
+    left: 0;
+}
+.OxImageViewer #OxImageOverlayRight {
+    right: 0;
+}
+.OxImageViewer #OxImageOverlayTop {
+    left: 0;
+    top: 0;
+    right: 0;
 }
 
 /*
@@ -2748,6 +2829,7 @@ Miscellaneous
 }
 .OxLoadingScreen > div > div {
     margin-top: 4px;
+    opacity: 0;
 }
 .OxLoadingScreen.OxAuto {
     left: 0;

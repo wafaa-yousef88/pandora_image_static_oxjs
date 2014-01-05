@@ -36,6 +36,13 @@
     "buttonDisabledGradient": [[192, 192, 192], [192, 192, 192]],
     "buttonSelectedColor": [32, 32, 32],
     "buttonSelectedGradient": [[160, 160, 160], [192, 192, 192]],
+    "buttonOverlayGradient": [[224, 224, 224, 0.75], [192, 192, 192, 0.75]],
+    "buttonOverlayActiveColor": [48, 48, 48],
+    "buttonOverlayActiveGradient": [[192, 192, 192, 0.75], [192, 192, 192, 0.75]],
+    "buttonOverlayDisabledColor": [128, 128, 128],
+    "buttonOverlayDisabledGradient": [[192, 192, 192, 0.75], [192, 192, 192, 0.75]],
+    "buttonOverlaySelectedColor": [32, 32, 32],
+    "buttonOverlaySelectedGradient": [[160, 160, 160, 0.75], [192, 192, 192, 0.75]],
 
     "calendarBackground": [232, 232, 232],
     "calendarControlBorder": [64, 64, 64],
@@ -77,6 +84,9 @@
     "formelementBorder": [176, 176, 176],
     "formelementColor": [64, 64, 64],
     "formelementFocusShadow": [128, 128, 128],
+    "formelementOverlayBorder": [32, 32, 32, 0.75],
+    "formelementOverlayColor": [32, 32, 32],
+    "formelementOverlayShadow": [208, 208, 208],
 
     "gridGradient": [[248, 248, 248], [232, 232, 232]],
 
@@ -92,6 +102,8 @@
 
     "labelBackground": [208, 208, 208],
     "labelDisabledColor": [128, 128, 128],
+    "labelOverlayBackground": [208, 208, 208, 0.75],
+    "labelOverlayDisabledColor": [128, 128, 128],
 
     "listHeadBorder": [192, 192, 192], // wrong?
     "listHeadSelectedColor": [0, 0, 0],
@@ -211,6 +223,9 @@
     "symbolDefaultColor": [64, 64, 64],
     "symbolDisabledColor": [128, 128, 128],
     "symbolFailedColor": [160, 0, 0],
+    "symbolOverlayColor": [32, 32, 32],
+    "symbolOverlayDisabledColor": [128, 128, 128],
+    "symbolOverlaySelectedColor": [32, 32, 32],
     "symbolPassedColor": [0, 160, 0],
     "symbolSelectedColor": [0, 0, 0],
     "symbolVideoColor": [64, 64, 64],
