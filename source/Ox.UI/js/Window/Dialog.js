@@ -27,7 +27,8 @@ Ox.Dialog = function(options, self) {
                 fixedSize: false,
                 fixedRatio: false,
                 focus: true,
-                height: 200,
+								//wafaa commented
+                //height: 200,
                 keys: {},
                 maxHeight: Infinity,
                 maximizeButton: false,
@@ -35,17 +36,19 @@ Ox.Dialog = function(options, self) {
                 minHeight: 64,
                 minWidth: 128,
                 removeOnClose: false,
-                title: '',
-                width: 400
+                title: ''
+								//wafaa commented
+                //width: 400
             })
             .options(options || {})
             .update({
                 buttons: setButtons,
                 content: setContent,
-                height: function() {
+								//wafaa
+                /*height: function() {
                     setMinAndMax();
                     setCSS({height: self.options.height});
-                },
+                },*/
                 title: function() {
                     self.$title.animate({
                         opacity: 0
@@ -55,12 +58,15 @@ Ox.Dialog = function(options, self) {
                         }, 50);
                     });
                 },
-                width: function() {
+								//wafaa
+                /*width: function() {
                     setMinAndMax();
                     setCSS({width: self.options.width});
-                }
+                }*/
             })
             .addClass('OxDialog')
+						//wafaa
+						.css({"background-image": "-moz-linear-gradient(center top , rgba(176, 176, 176, 0.95), rgba(144, 144, 144, 0.95))", "height": "100%", "width": "100%"/*, "overflow": "scroll"*/})
             .bindEvent({
                 key_enter: function() {
                     keypress('enter');
@@ -88,9 +94,15 @@ Ox.Dialog = function(options, self) {
         .css({zIndex: 11});
 
     self.$titlebar = Ox.Bar({
-            size: 24
+						//wafaa
+            //size: 24
+						//size: 480
         })
-        .addClass('OxTitlebar')
+        .addClass('OxTitlebar OxDialogBar')
+				//wafaa added static css 
+        /*.css({
+            width: 'auto',
+        })*/								
         .appendTo(that);
 
     if (self.options.closeButton) {
@@ -124,7 +136,7 @@ Ox.Dialog = function(options, self) {
             })
             .appendTo(self.$titlebar);
     }
-
+		
     self.$title = Ox.Element()
         .addClass('OxTitle')
         .css({
@@ -133,8 +145,46 @@ Ox.Dialog = function(options, self) {
         })
         .html(self.options.title)
         .appendTo(self.$titlebar);
+		//wafaa
+		$('<button>Auto Play</button>').addClass('autoPlay').css({"margin-top": '-19px', "float": 'right', "color": 'black'}).appendTo(self.$titlebar);
+		$(document).on('click','.autoPlay',function(){
+				alert(self.options);
+				console.log(self.options);
+				//getNext();
+		});
+		//wafaa
+    function getNext() {
+        var pos = -1;
+        if (item.length) {
+            pos = (self.options.orientation == 'both'
+                ? item[item.length - 1]
+                : Ox.max(item)) + 1;
+            if (pos == self.$items.length) {
+                pos = -1;
+            }
+        }
+        return pos;
+    }
+
+    function getPrevious() {
+        var pos = -1;
+        if (self.selected.length) {
+            pos = (self.options.orientation == 'both'
+                ? self.selected[self.selected.length - 1]
+                : Ox.min(self.selected)) - 1;
+        }
+        return pos;
+    }
 
     setContent();
+
+		//wafaa
+		$(document).keydown(function(e){
+				//escape key
+    		if (e.keyCode == 27) { 
+       		that.close();
+    		}
+		});
 
     if (self.hasButtons) {
         self.$buttonsbar = Ox.Bar({
@@ -286,9 +336,12 @@ Ox.Dialog = function(options, self) {
         Ox.Log('Window', id, getButtonById(id));
         id && getButtonById(id).$element.trigger('click');
     }
-
+		
     function maximize() {
         var data, offset = that.offset();
+				//wafaa
+				var highReso = Ox.max(pandora.site.video.resolutions);
+				//wafaa
         decenter();
         if (!self.maximized) {
             self.originalLeft = offset.left;
@@ -296,18 +349,26 @@ Ox.Dialog = function(options, self) {
             self.originalWidth = self.options.width;
             self.originalHeight = self.options.height;
         }
+				//wafaa removing controls on maximize
+				that
         setCSS(self.maximized ? {
             left: self.originalLeft,
             top: self.originalTop,
             width: self.originalWidth,
             height: self.originalHeight
         } : {
-            left: Math.round((window.innerWidth - self.options.maxWidth) / 2),
-            top: Math.round((window.innerHeight - self.options.maxHeight - self.barsHeight) / 2),
-            width: self.options.maxWidth,
-            height: self.options.maxHeight
+						//wafaa commented
+            //left: Math.round((window.innerWidth - self.options.maxWidth) / 2),
+            //top: Math.round((window.innerHeight - self.options.maxHeight - self.barsHeight) / 2),
+						//left: '10%',
+						//wafaa
+            //width: self.options.maxWidth,
+            //height: self.options.maxHeight,
         }, true);
         self.maximized = !self.maximized;
+				var item_id = pandora.user.ui.listSelection
+				$('.OxContentImg').attr({src: '/' + item_id + '/' + highReso + 'p.png'})
+				$('.OxDialogBar').css({display:'none'});
     }
 
     function reset(animate) {
@@ -571,18 +632,29 @@ Ox.Dialog = function(options, self) {
             });
             self.options.content.css({
                 opacity: 0
+
             });
         }
         self.$content = (isImage ? self.options.content : Ox.Element())
-            .addClass('OxContent')
+            .addClass('OxContent OxContentImg')
+						//wafaa
+						//attr({src: '/' + item.id + '/720p.png'})
             .css(self.hasButtons ? {
                 bottom: '24px'
             } : {
+								//wafaa				
+								//margin: '24px 0 0 335px',	
                 bottom: 0,
                 borderBottomLeftRadius: '8px',
-                borderBottomRightRadius: '8px'
+                borderBottomRightRadius: '8px',
+                borderTopLeftRadius: '8px',
+                borderTopRightRadius: '8px',
+ 								//top: '3%',
+								left: '11%'										
             })
             .appendTo(that);
+						console.log(self);
+						console.log(that);
         !isImage && self.$content.append(
             self.options.content.css(self.hasButtons ? {} : {
                 borderBottomLeftRadius: '8px',
