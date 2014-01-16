@@ -119,7 +119,7 @@ Ox.TableList = function(options, self) {
                 }
             })
             .addClass('OxTableList');
-    
+   
     self.options.columns.forEach(function(column) { // fixme: can this go into a generic ox.js function?
         // fixme: and can't these just remain undefined?
         if (Ox.isUndefined(column.align)) {

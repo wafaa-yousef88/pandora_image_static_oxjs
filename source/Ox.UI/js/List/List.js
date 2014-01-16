@@ -102,7 +102,7 @@ Ox.List = function(options, self) {
                                 sort: self.options.sort,
                                 sums: self.options.sums,
                                 unique: self.options.unique
-                            });                
+                            });        
                             /*
                             self.listLength = self.options.items.length;
                             updateSelected();
@@ -1823,7 +1823,7 @@ Ox.List = function(options, self) {
             return that;
         }
     };
-
-    return that;
+    
+		return that;
 
 };
