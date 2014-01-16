@@ -209,9 +209,11 @@ Ox.Input = function(options, self) {
         .css({
             float: 'left' // fixme: use css rule
         })
-        .click(function() {
-            // fixme: ???
-            // that.focus();
+        .on({
+            click: function() {
+                // fixme: ???
+                // that.focus();
+            }
         })
         .appendTo(that);
     }
@@ -224,11 +226,11 @@ Ox.Input = function(options, self) {
                     title: 'left',
                     type: 'image'
                 })
-                .css({
-                    float: 'left'
-                })
-                .click(function() {
-                    clickArrow(0);
+                .css({float: 'left'})
+                .on({
+                    click: function() {
+                        clickArrow(0);
+                    }
                 })
                 .appendTo(that),
             Ox.Button({
@@ -236,11 +238,11 @@ Ox.Input = function(options, self) {
                     title: 'right',
                     type: 'image'
                 })
-                .css({
-                    float: 'right'
-                })
-                .click(function() {
-                    clickArrow(1);
+                .css({float: 'right'})
+                .on({
+                    click: function() {
+                        clickArrow(0);
+                    }
                 })
                 .appendTo(that)
         ]
@@ -285,9 +287,11 @@ Ox.Input = function(options, self) {
             } : {})
         )
         .val(self.options.value)
-        .blur(blur)
-        .change(change)
-        .focus(focus)
+        .on({
+            blur: blur,
+            change: change,
+            focus: focus
+        })
         .appendTo(that);
 
     if (self.options.type == 'textarea') {
@@ -333,15 +337,10 @@ Ox.Input = function(options, self) {
             .addClass('OxInput OxMedium Ox' +
                 Ox.toTitleCase(self.options.style) +
                 ' OxPlaceholder')
-            .attr({
-                type: 'text'
-            })
-            .css({
-                //float: 'left',
-                width: self.inputWidth + 'px'
-            })
+            .attr({type: 'text'})
+            .css({width: self.inputWidth + 'px'})
             .val(self.options.placeholder)
-            .focus(focus)
+            .on({focus: focus})
             .appendTo(that);
     }
 

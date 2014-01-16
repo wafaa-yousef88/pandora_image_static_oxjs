@@ -556,10 +556,11 @@ Ox.makeArray <f> Wraps any non-array in an array.
     > Ox.makeArray(['foo'])
     ['foo']
 @*/
+// FIXME: rename to toArray
 Ox.makeArray = function(value) {
     var ret, type = Ox.typeOf(value);
     if (type == 'arguments') {
-        ret = Ox.toArray(value);
+        ret = Ox.slice(value);
     } else if (type == 'array') {
         ret = value;
     } else {
@@ -623,7 +624,7 @@ Ox.range <f> Python-style range
 @*/
 Ox.range = function() {
     var array = [];
-    Ox.loop.apply(null, Ox.toArray(arguments).concat(function(index) {
+    Ox.loop.apply(null, Ox.slice(arguments).concat(function(index) {
         array.push(index);
     }));
     return array;
@@ -739,38 +740,6 @@ Ox.range = function() {
 }());
 
 /*@
-Ox.toArray <f> Takes an array-like object and returns a true array
-    (value) -> <a> True array
-    value <*> Array-like object
-    > (function() { return Ox.toArray(arguments); }('foo', 'bar'))
-    ['foo', 'bar']
-    > Ox.toArray('foo')
-    ['f', 'o', 'o']
-    > Ox.toArray({0: 'f', 1: 'o', 2: 'o', length: 3})
-    ['f', 'o', 'o']
-@*/
-Ox.toArray = function(collection) {
-    return Ox.slice(collection);
-};
-try {
-    Array.prototype.slice.call(document.getElementsByTagName('a'));
-} catch (error) {
-    // Handle IE NodeLists
-    Ox.toArray = function(collection) {
-        var i, length, ret = [];
-        try {
-            ret = Ox.slice(collection);
-        } catch (error) {
-            length = collection.length;
-            for (i = 0; i < length; i++) {
-                ret[i] = collection[i];
-            }
-        }
-        return ret;
-    };
-}
-
-/*@
 Ox.unique <f> Removes duplicate values from an array
     (array) -> <a> Array without duplicate values
     > Ox.unique([1, 2, 3, 2, 1])
@@ -792,7 +761,7 @@ Ox.zip <f> Zips an array of arrays
     [[0, 3], [1, 4], [2, 5]]
 @*/
 Ox.zip = function() {
-    var args = arguments.length == 1 ? arguments[0] : Ox.toArray(arguments),
+    var args = arguments.length == 1 ? arguments[0] : Ox.slice(arguments),
         array = [];
     args[0].forEach(function(value, index) {
         array[index] = [];

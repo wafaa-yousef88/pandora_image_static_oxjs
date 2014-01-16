@@ -6,6 +6,7 @@ Ox.SplitPanel <f> SpliPanel Object
         elements <[o]|[]> Array of two or three element objects
             collapsible <b|false> If true, can be collapsed (if outer element)
             collapsed <b|false> If true, is collapsed (if collapsible)
+            defaultSize <n|s|auto> Default size in px (restorable via reset)
             element <o> Any Ox.Element
                 If any element is collapsible or resizable, all elements must
                 have an id.
@@ -25,9 +26,10 @@ Ox.SplitPanel <f> SpliPanel Object
 Ox.SplitPanel = function(options, self) {
 
     // fixme: doubleclick on resizebar should reset to initial size
+    // (but anyclick would become singleclick, i.e. less responsive)
 
     self = self || {};
-    var that = Ox.Element({}, self) // fixme: Container?
+    var that = Ox.Element({}, self)
             .defaults({
                 elements: [],
                 orientation: 'horizontal'
@@ -48,8 +50,8 @@ Ox.SplitPanel = function(options, self) {
     });
 
     // create elements
-    that.$elements = [];
-    self.options.elements.forEach(function(element, i) {
+    // fixme: attach to self instead?
+    that.$elements = Ox.map(self.options.elements, function(element, i) {
         self.options.elements[i] = Ox.extend({
             collapsible: false,
             collapsed: false,
@@ -57,9 +59,11 @@ Ox.SplitPanel = function(options, self) {
             resize: [],
             size: 'auto'
         }, element);
-        that.$elements[i] = element.element
-            .css(self.edges[2], (parseInt(element.element.css(self.edges[2]), 10) || 0) + 'px')
-            .css(self.edges[3], (parseInt(element.element.css(self.edges[3]), 10) || 0) + 'px');
+        // top and bottom (horizontal) or left and right (vertical)
+        self.edges.slice(2).forEach(function(edge) {
+            element.element.css(edge, (parseInt(element.element.css(edge)) || 0) + 'px')
+        });
+        return element.element;
     });
 
     // create resizebars
@@ -77,14 +81,17 @@ Ox.SplitPanel = function(options, self) {
                     that.$elements[self.resizebarElements[index][1]]
                 ],
                 id: element.element.options('id'),
-                orientation: self.options.orientation == 'horizontal' ? 'vertical' : 'horizontal',
+                orientation: self.options.orientation == 'horizontal'
+                    ? 'vertical' : 'horizontal',
                 parent: that, // fixme: that.$content
                 resizable: element.resizable,
                 resize: element.resize,
                 size: element.size,
                 tooltip: element.tooltip
             });
-            self.$resizebars[index][i == 0 ? 'insertAfter' : 'insertBefore'](that.$elements[i]);
+            self.$resizebars[index][
+                i == 0 ? 'insertAfter' : 'insertBefore'
+            ](that.$elements[i]);
         }
     });
 
@@ -96,23 +103,24 @@ Ox.SplitPanel = function(options, self) {
 
     setSizes(true);
 
-    function getPositionById(id) {
-        var position = -1;
+    function getIndexById(id) {
+        var index = -1;
         Ox.forEach(self.options.elements, function(element, i) {
             if (element.element.options('id') == id) {
-                position = i;
+                index = i;
                 return false; // break
             }
         });
-        return position;
+        return index;
     }
 
-    function getSize(element) {
+    function getSize(index) {
+        var element = self.options.elements[index];
         return element.size + (element.collapsible || element.resizable);
-        //return (element.size + (element.collapsible || element.resizable)) * !element.collapsed;
     }
 
-    function getVisibleSize(element) {
+    function getVisibleSize(index) {
+        var element = self.options.elements[index];
         return getSize(element) * !element.collapsed;
     }
 
@@ -122,37 +130,44 @@ Ox.SplitPanel = function(options, self) {
             // fixme: maybe we can add a conditional here, since init
             // is about elements that are collapsed splitpanels
             var css = {},
-                edges = [
-                    (init && parseInt(that.$elements[i].css(self.edges[0]), 10)) || 0,
-                    (init && parseInt(that.$elements[i].css(self.edges[1]), 10)) || 0
-                ];
+                edges = self.edges.slice(0, 2).map(function(edge) {
+                     // left/right (horizontal) or top/bottom (vertical)
+                     return init && parseInt(that.$elements[i].css(edge)) || 0;
+                });
             if (element.size != 'auto') {
+                // width (horizontal) or height (vertical)
                 css[self.dimensions[0]] = element.size + 'px';
             }
             if (i == 0) {
+                // left (horizontal) or top (vertical)
                 css[self.edges[0]] = edges[0] + 'px';
+                // right (horizontal) or bottom (vertical)
                 if (element.size == 'auto') {
-                    css[self.edges[1]] = getSize(self.options.elements[1])
+                    css[self.edges[1]] = getSize(1)
                     + (
-                        self.length == 3 ? getVisibleSize(self.options.elements[2]) : 0
+                        self.length == 3 ? getVisibleSize(2) : 0
                     ) + 'px';
                 }
             } else if (i == 1) {
+                // left (horizontal) or top (vertical)
                 if (self.options.elements[0].size != 'auto') {
-                    css[self.edges[0]] = edges[0] + getSize(self.options.elements[0]) + 'px'
+                    css[self.edges[0]] = edges[0] + getSize(0) + 'px'
                 } else {
                     css[self.edges[0]] = 'auto'; // fixme: why is this needed?
                 }
+                // right (horizontal) or bottom (vertical)
                 css[self.edges[1]] = (
-                    self.length == 3 ? getSize(self.options.elements[2]) : 0
+                    self.length == 3 ? getSize(2) : 0
                 ) + 'px';
             } else {
+                // left (horizontal) or top (vertical)
                 if (element.size == 'auto') {
                     css[self.edges[0]] = getVisibleSize(self.options.elements[0])
-                        + getSize(self.options.elements[1]) + 'px';
+                        + getSize(1) + 'px';
                 } else {
                     css[self.edges[0]] = 'auto'; // fixme: why is this needed?
                 }
+                // right (horizontal) or bottom (vertical)
                 css[self.edges[1]] = edges[1] + 'px';
             }
             if (animate) {
@@ -164,6 +179,7 @@ Ox.SplitPanel = function(options, self) {
             }
             if (element.collapsible || element.resizable) {
                 css = {};
+                // left or right (horizontal) or top or bottom (vertical)
                 css[self.edges[i == 0 ? 0 : 1]] = element.size + 'px'
                 if (animate) {
                     self.$resizebars[i == 0 ? 0 : 1].animate(css, 250);
@@ -177,40 +193,42 @@ Ox.SplitPanel = function(options, self) {
 
     /*@
     getSize <f> get size of panel
-        (id) -> <i> id or position of panel, returns size
-        id <s|i> The element's id or position
+        (id) -> <i> id or index of element, returns size
+        id <s|i> The element's id or index
     @*/
     // fixme: what is this? there is that.size()
     that.getSize = function(id) {
-        var pos = Ox.isNumber(id) ? id : getPositionById(id),
-            element = self.options.elements[pos];
-        return element.element[self.dimensions[0]]() * !that.isCollapsed(pos);
+        var index = Ox.isNumber(id) ? id : getIndexById(id),
+            element = self.options.elements[index];
+        return element.element[self.dimensions[0]]() * !that.isCollapsed(index);
     };
 
     /*@
     isCollapsed <f> panel collapsed state
-        (id) -> <b> id or position of panel, returns collapsed state
-        id <i> The element's id or position
+        (id) -> <b> id or index of element, returns collapsed state
+        id <i> The element's id or index
     @*/
     that.isCollapsed = function(id) {
-        var pos = Ox.isNumber(id) ? id : getPositionById(id);
-        return self.options.elements[pos].collapsed;
+        var index = Ox.isNumber(id) ? id : getIndexById(id);
+        return self.options.elements[index].collapsed;
     };
 
     /*@
     replaceElement <f> Replace panel element
         (id, element) -> <f> replace element
-        id <s|n> The element's id or position
-        element <o> new element
+        id <s|n> The element's id or index
+        element <o> New element
     @*/
     that.replaceElement = function(id, element) {
-        // one can pass pos instead of id
-        var pos = Ox.isNumber(id) ? id : getPositionById(id);
-        that.$elements[pos] = element
-            .css(self.edges[2], (parseInt(element.css(self.edges[2]), 10) || 0) + 'px')
-            .css(self.edges[3], (parseInt(element.css(self.edges[3]), 10) || 0) + 'px');
-        self.options.elements[pos].element.replaceWith(
-            self.options.elements[pos].element = element
+        // one can pass index instead of id
+        var index = Ox.isNumber(id) ? id : getIndexById(id);
+        // top and bottom (horizontal) or left and right (vertical)
+        self.edges.slice(2).forEach(function(edge) {
+            element.css(edge, (parseInt(element.css(self.edges[2])) || 0) + 'px');
+        });
+        that.$elements[index] = element;
+        self.options.elements[index].element.replaceWith(
+            self.options.elements[index].element = element
         );
         setSizes();
         self.$resizebars.forEach(function($resizebar, i) {
@@ -259,15 +277,15 @@ Ox.SplitPanel = function(options, self) {
     reset <f> Reset an outer element to its initial size
     @*/
     that.reset = function(id) {
-        // one can pass pos instead of id
-        var pos = Ox.isNumber(id) ? id : getPositionById(id),
-            element = self.options.elements[pos];
-        element.size = self.defaultSize[pos];
+        // one can pass index instead of id
+        var index = Ox.isNumber(id) ? id : getIndexById(id),
+            element = self.options.elements[index];
+        element.size = self.defaultSize[index];
         setSizes(false, function() {
             element.element.triggerEvent('resize', {
                 size: element.size
             });
-            element = self.options.elements[pos == 0 ? 1 : pos - 1];
+            element = self.options.elements[index == 0 ? 1 : index - 1];
             element.element.triggerEvent('resize', {
                 size: element.element[self.dimensions[0]]()
             });
@@ -279,17 +297,16 @@ Ox.SplitPanel = function(options, self) {
         (id) -> <i> Returns size
         (id, size) -> <o> Sets size, returns SplitPanel
         (id, size, callback) -> <o> Sets size with animation, returns SplitPanel
-        id <i> The element's id or position
+        id <i> The element's id or index
         size <i> New size, in px
         callback <b|f> Callback function (passing true animates w/o callback)
     @*/
     that.size = function(id, size, callback) {
-        // one can pass pos instead of id
-        var pos = Ox.isNumber(id) ? id : getPositionById(id),
-            element = self.options.elements[pos],
-            animate = {};
+        // one can pass index instead of id
+        var index = Ox.isNumber(id) ? id : getIndexById(id),
+            element = self.options.elements[index];
         if (arguments.length == 1) {
-            return element.element[self.dimensions[0]]() * !that.isCollapsed(pos);
+            return element.element[self.dimensions[0]]() * !that.isCollapsed(index);
         } else {
             element.size = size;
             setSizes(false, callback);
@@ -300,28 +317,28 @@ Ox.SplitPanel = function(options, self) {
     /*@
     toggle <f> Toggles collapsed state of an outer element
         (id) -> <o> The SplitPanel
-        id <s|i> The element's id or position
+        id <s|i> The element's id or index
     @*/
-    // FIXME: isn't 'toggle' reserved by jQuery?
+    // FIXME: 'toggle' is reserved by jQuery
     that.toggle = function(id) {
-        // one can pass pos instead of id
+        // one can pass index instead of id
         if (self.toggling) {
             return false;
         }
-        var pos = Ox.isNumber(id) ? id : getPositionById(id),
-            element = self.options.elements[pos],
-            value = parseInt(that.css(self.edges[pos == 0 ? 0 : 1]), 10)
+        var index = Ox.isNumber(id) ? id : getIndexById(id),
+            element = self.options.elements[index],
+            value = parseInt(that.css(self.edges[index == 0 ? 0 : 1]), 10)
                 + element.element[self.dimensions[0]]() * (element.collapsed ? 1 : -1),
             animate = {};
         self.toggling = true;
-        animate[self.edges[pos == 0 ? 0 : 1]] = value;
+        animate[self.edges[index == 0 ? 0 : 1]] = value;
         that.animate(animate, 250, function() {
             element.collapsed = !element.collapsed;
             element.element.triggerEvent('toggle', {
                 collapsed: element.collapsed
             });
-            self.$resizebars[pos == 0 ? 0 : 1].options({collapsed: element.collapsed});
-            element = self.options.elements[pos == 0 ? 1 : pos - 1];
+            self.$resizebars[index == 0 ? 0 : 1].options({collapsed: element.collapsed});
+            element = self.options.elements[index == 0 ? 1 : index - 1];
             element.element.triggerEvent('resize', {
                 size: element.element[self.dimensions[0]]()
             });
@@ -331,14 +348,14 @@ Ox.SplitPanel = function(options, self) {
 
     /*@
     updateSize <f> update size of element
-        (pos, size) -> <o> update size of element
-        pos <i> position of element
+        (index, size) -> <o> update size of element
+        index <i> index of element
         size <n> new size
     @*/
-    that.updateSize = function(pos, size) {
+    that.updateSize = function(index, size) {
         // this is called from resizebar
-        pos = pos == 0 ? 0 : self.options.elements.length - 1; // fixme: silly that 0 or 1 is passed, and not pos
-        self.options.elements[pos].size = size;
+        index = index == 0 ? 0 : self.options.elements.length - 1; // fixme: silly that 0 or 1 is passed, and not index
+        self.options.elements[index].size = size;
     };
 
     return that;

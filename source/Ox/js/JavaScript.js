@@ -244,7 +244,8 @@ Ox.doc = (function() {
                     } else if (subitem.types[0] == 'event') {
                         item.events = item.events || [];
                         item.events.push(parseNode(node));
-                        order.push('events');
+                        // FIXME: unclear if this should be part of order, too
+                        // order.push('events');
                     } else {
                         key = item.types[0] == 'function'
                             && !/^\./.test(subitem.name)

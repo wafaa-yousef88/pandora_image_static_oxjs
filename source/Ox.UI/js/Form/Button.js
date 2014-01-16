@@ -80,8 +80,10 @@ Ox.Button = function(options, self) {
             .css(self.options.width == 'auto' ? {} : {
                 width: (self.options.width - 14) + 'px'
             })
-            .mousedown(mousedown)
-            .click(click);
+            .on({
+                click: click,
+                mousedown: mousedown
+            });
 
     if (self.options.values.length) {
         self.options.values = self.options.values.map(function(value) {
@@ -145,7 +147,12 @@ Ox.Button = function(options, self) {
                 src: Ox.UI.getImageURL(
                     'symbol' + self.options.title[0].toUpperCase()
                         + self.options.title.slice(1),
-                    self.options.style == 'video' ? 'video'
+                    self.options.style == 'overlay' ? 'overlay' + (
+                            self.options.disabled ? 'Disabled'
+                            : self.options.selectable && self.options.value ? 'Selected'
+                            : ''
+                        )
+                        : self.options.style == 'video' ? 'video'
                         : self.options.disabled ? 'disabled'
                         : self.options.selectable && self.options.value ? 'selected'
                         : ''

@@ -28,11 +28,31 @@ Ox.$ <f> Generic HTML element, mimics jQuery
     true
 @*/
 Ox.$ = Ox.element = function(value) {
-    var element = !Ox.isString(value) ? value // window, document or element
-        : value[0] == '<' ? document.createElement(value.slice(1, -1))
-        : value[0] == '#' ? document.getElementById(value.slice(1))
-        : value[0] == '.' ? document.getElementsByClassName(value.slice(1))[0]
-        : document.getElementsByTagName(value)[0];
+
+    var data = {},
+        element = !Ox.isString(value) ? value // window, document or element
+            : value[0] == '<' ? document.createElement(value.slice(1, -1))
+            : value[0] == '#' ? document.getElementById(value.slice(1))
+            : value[0] == '.' ? document.getElementsByClassName(value.slice(1))[0]
+            : document.getElementsByTagName(value)[0],
+        mousewheelEvents = ['wheel', 'mousewheel'],
+        originalMousewheelEvents = 'onwheel' in document ? ['wheel']
+            : ['mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
+
+    function normalizeEvents(args) {
+        var ret = {};
+        Ox.forEach(Ox.makeObject(args), function(callback, event) {
+            if (Ox.contains(mousewheelEvents, event)) {
+                originalMousewheelEvents.forEach(function(event) {
+                    ret[event] = callback;
+                });
+            } else {
+                ret[event] = callback;
+            }
+        });
+        return ret;
+    }
+
     return element ? {
         //@ 0 <h> The DOM element itself
         0: element,
@@ -48,56 +68,66 @@ Ox.$ = Ox.element = function(value) {
             return this;
         },
         /*@
-        append <f> Appends another element to this element
-            (element) -> <o> This element
-            element <o|[o]> One or more elements
+        append <f> Appends one or more elements to this element
+            (element[, element[, ...]]) -> <o> This element
+            element <o> Another element
         @*/
         append: function() {
             var that = this;
-            Ox.makeArray(arguments[0]).forEach(function(element) {
-                that[0].appendChild(element[0]);                
+            Ox.slice(arguments).forEach(function($element) {
+                that[0].appendChild($element[0]);                
             });
             return this;
         },
         /*@
-        appendTo <f> appends this element object to another element object
+        appendTo <f> Appends this element object to another element object
             (element) -> <o> This element
             element <o> Another element
         @*/
-        appendTo: function(element) {
-            element[0].appendChild(this[0]);
+        appendTo: function($element) {
+            $element[0].appendChild(this[0]);
             return this;
         },
         /*@
         attr <f> Gets or sets an attribute
             (key) -> <s> Value
             (key, value) -> <o> This element
-            ({key: value, key1: value1, ...}) -> <o> This element
-            key   <str> Attribute name
-            value <str> Attribute value
+            ({key0: value0, key1: value1, ...}) -> <o> This element
+            key <s> Attribute name
+            value <s> Attribute value
         @*/
         attr: function() {
             var ret, that = this;
             if (arguments.length == 1 && Ox.isString(arguments[0])) {
-                ret = this[0].getAttribute(arguments[0]);
+                ret = this[0].getAttribute
+                    ? this[0].getAttribute(arguments[0])
+                    : null;
+                // fixme: why exactly is this needed?
                 if (ret === null) {
                     ret = void 0;
                 }
             } else {
                 Ox.forEach(Ox.makeObject(arguments), function(value, key) {
-                    that[0].setAttribute(key, value);
+                    that[0].setAttribute && that[0].setAttribute(key, value);
                 });
                 ret = this;
             }
             return ret;
         },
         /*@
+        children <f> Returns the children of this element
+            () -> <[h]> Children
+        @*/
+        children: function() {
+            return Ox.slice(this[0].childNodes);
+        },
+        /*@
         css <f> Gets or sets a CSS attribute
             (key) -> <s> Value
             (key, value) -> <o> This element
             ({key0: value0, key1: value1, ...}) -> <o> This element
-            key <str> Attribute name
-            value <str> Attribute value
+            key <s> Attribute name
+            value <s> Attribute value
         @*/
         css: function() {
             var ret, that = this;
@@ -112,11 +142,42 @@ Ox.$ = Ox.element = function(value) {
             return ret;
         },
         /*@
+        data <f> Gets or sets data
+            () -> <o> All data
+            (key) -> <s> Value
+            (key, value) -> <o> This element
+            ({key0: value0, key1: value1, ...}) -> <o> This element
+            key <s> Property
+            value <*> Value
+        @*/
+        data: function() {
+            var ret;
+            if (arguments.length == 0) {
+                ret = data;
+            } else if (arguments.length == 1 && Ox.isString(arguments[0])) {
+                ret = data[arguments[0]]
+            } else {
+                Ox.forEach(Ox.makeObject(arguments), function(value, key) {
+                    data[key] = value;
+                });
+                ret = this;
+            }
+            return ret;
+        },
+        /*@
         empty <f> Empties the inner HTML
             () -> <o> This element
         @*/
         empty: function() {
             return this.html('');
+        },
+        /*@
+        find <f> Find descendant elements
+            ([selector]) -> <[h]> Elements
+            selector <s|'*'> CSS selector
+        @*/
+        find: function(string) {
+            return Ox.slice(this[0].querySelectorAll(string || '*'));
         },
         /*@
         hasClass <f> Returns true if this element has a given class
@@ -157,6 +218,65 @@ Ox.$ = Ox.element = function(value) {
             return ret;
         },
         /*@
+        insertAfter <f> Inserts this element after another element
+            (element) -> <o> This element
+            element <o> Another element
+        @*/
+        insertAfter: function($element) {
+            $element[0].parentNode.insertBefore(this[0], $element[0].nextSibling);
+            return this;
+        },
+        /*@
+        insertBefore <f> Inserts this element before another element
+            (element) -> <o> This element
+            element <o> Another element
+        @*/
+        insertBefore: function($element) {
+            $element[0].parentNode.insertBefore(this[0], $element[0]);
+            return this;
+        },
+        /*@
+        next <f> Returns the sibling after this element
+            () -> <h> Next element
+        @*/
+        next: function() {
+            return this[0].nextSibling;
+        },
+        /*@
+        nextAll <f> Returns all siblings after this element
+            () -> <[h]> Next elements
+        @*/
+        nextAll: function() {
+            var sibling = this[0], siblings = [];
+            while (true) {
+                var sibling = sibling.nextSibling;
+                if (!sibling) {
+                    break;
+                }
+                siblings.push(sibling);
+            }
+            return siblings;
+        },
+        /*@
+        off <f> Unbinds a callback from an event
+            (event) -> <o> This element (unbinds all callbacks)
+            (event, callback) -> <o> This element
+            ({event0: callback0, event1: callback1, ...}) -> <o> This element
+            event <s> Event name
+            callback <f> Callback function
+        @*/
+        off: function(event, callback) {
+            var that = this;
+            Ox.forEach(normalizeEvents(arguments), function(callback, event) {
+                if (callback) {
+                    that[0].removeEventListener(event, callback, false);
+                } else {
+                    that[0]['on' + event] = null;
+                }
+            });
+            return this;
+        },
+        /*@
         on <f> Binds a callback to an event
             (event, callback) -> <o> This element
             ({event0: callback0, event1: callback1, ...}) -> <o> This element
@@ -166,7 +286,7 @@ Ox.$ = Ox.element = function(value) {
         @*/
         on: function() {
             var that = this;
-            Ox.forEach(Ox.makeObject(arguments), function(callback, event) {
+            Ox.forEach(normalizeEvents(arguments), function(callback, event) {
                 that[0].addEventListener(event, callback, false);
             });
             return this;
@@ -180,33 +300,80 @@ Ox.$ = Ox.element = function(value) {
                 e <o> Event properties
         @*/
         one: function(events) {
-            var that = this;
-            Ox.forEach(Ox.makeObject(arguments), function(callback, event) {
+            var args = Ox.slice(arguments), that = this;
+            Ox.forEach(normalizeEvents(arguments), function(callback, event) {
                 that.on(event, function fn() {
                     that.off(event, fn);
-                    callback();
+                    return callback.apply(that, args);
                 });
             });
             return this;
         },
         /*@
-        off <f> Unbinds a callback from an event
-            (event) -> <o> This element (unbinds all callbacks)
-            (event, callback) -> <o> This element
-            ({event0: callback0, event1: callback1, ...}) -> <o> This element
-            event <s> Event name
-            callback <f> Callback function
+        parent <f> Returns the parent of this element
+            () -> <h> Parent element
         @*/
-        off: function(event, callback) {
-            var that = this;
-            Ox.forEach(Ox.makeObject(arguments), function(callback, event) {
-                if (callback) {
-                    that[0].removeEventListener(event, callback, false);
-                } else {
-                    that[0]['on' + event] = null;
+        parent: function() {
+            return this[0].parentNode;
+        },
+        /*@
+        parents <f> Returns all ancestors of this element
+            () -> <[h]> Ancestor elements
+        @*/
+        parents: function() {
+            var parent = this[0], parents = [];
+            while (true) {
+                var parent = parent.parentNode;
+                if (!parent) {
+                    break;
                 }
+                parents.unshift(parent);
+            }
+            return parents;
+        },
+        /*@
+        prepend <f> Prepends one or more elements to this element
+            (element[, element[, ...]]) -> <o> This element
+            element <o> Another element
+        @*/
+        prepend: function() {
+            var parent = this[0].parentNode;
+            Ox.slice(arguments).reverse().forEach(function($element) {
+                parent.insertBefore($element[0], parent.firstChild);
             });
             return this;
+        },
+        /*@
+        prependTo <f> Prepends this element object to another element object
+            (element) -> <o> This element
+            element <o> Another element
+        @*/
+        prependTo: function($element) {
+            var element = $element[0];
+            element.insertBefore(this[0], element.firstChild);
+            return this;
+        },
+        /*@
+        prev <f> Returns the sibling before this element
+            () -> <h> Next element
+        @*/
+        prev: function() {
+            return this[0].previousSibling;
+        },
+        /*@
+        prevAll <f> Returns all siblings before this element
+            () -> <[h]> Next elements
+        @*/
+        prevAll: function() {
+            var sibling = this[0], siblings = [];
+            while (true) {
+                var sibling = sibling.previousSibling;
+                if (!sibling) {
+                    break;
+                }
+                siblings.unshift(sibling);
+            }
+            return siblings;
         },
         /*@
         remove <f> Removes this element from the DOM
@@ -244,11 +411,59 @@ Ox.$ = Ox.element = function(value) {
             return this;
         },
         /*@
-        show <f> Show this element
+        replace <f> Replaces another element with this element
+            (element) -> <o> This element
+            element <o> Another element
+        @*/
+        replace: function($element) {
+            var next = $element[0].nextSibling, parent = $element[0].parentNode;
+            $element.remove();
+            parent.insertBefore(this[0], next);
+            return this;
+        },
+        /*@
+        replaceWith <f> Replaces this element with another element
+            (element) -> <o> This element
+            element <o> Another element
+        @*/
+        replaceWith: function($element) {
+            var next = this[0].nextSibling, parent = this[0].parentNode;
+            this.remove();
+            parent.insertBefore($element[0], next);
+            return this;
+        },
+        /*@
+        show <f> Shows this element
             () -> This element
         @*/
         show: function() {
             return this.css({display: 'block'});
+        },
+        /*@
+        siblings <f> Returns all siblings of this element
+        () -> <[oh]> Sibling elements
+        @*/
+        siblings: function() {
+            var that = this;
+            return Ox.filter(this[0].parentNode.childNodes, function(element) {
+                return element !== that[0];
+            });
+        },
+        /*@
+        text <f> Gets or sets the text contents
+            () -> <s> The text contents
+            (text) -> <o> This element
+            text <s> The text contents
+        @*/
+        text: function() {
+            var ret;
+            if (arguments.length == 0) {
+                ret = Ox.isString(this.textContent)
+                    ? this.textContent : this.innerText;
+            } else {
+                ret = this.empty().append(this[0].createTextNode(string));
+            }
+            return ret;
         },
         /*@
         toggleClass <f> Toggles a class name
@@ -294,6 +509,7 @@ Ox.$ = Ox.element = function(value) {
             return this[0].offsetWidth;            
         }
     } : null;
+
 };
 
 /*@

@@ -63,6 +63,21 @@
     };
 
     /*@
+    Ox.getAverageBearing <f> Returns the average of two bearings
+        > Ox.getAverageBearing(0, 90)
+        45
+        > Ox.getAverageBearing(10, 350)
+        0
+    @*/
+    // FIXME: find the proper name of this operation
+    // FIMXE: use in manhattan grid example
+    Ox.getAverageBearing = function(bearingA, bearingB) {
+        return Ox.mod((bearingA + bearingB) / 2 + (
+            Math.abs(bearingA - bearingB) > 180 ? 180 : 0
+        ), 360);
+    };
+
+    /*@
     Ox.getBearing <f> Returns the bearing from one point to another
         > Ox.getBearing({lat: -45, lng: 0}, {lat: 45, lng: 0})
         0
@@ -78,6 +93,12 @@
             y = Math.sin(pointB.lng - pointA.lng)
                 * Math.cos(pointB.lat);
         return (Ox.deg(Math.atan2(y, x)) + 360) % 360;
+    };
+
+    // FIXME: name, docs
+    Ox.getBearingDifference = function(bearingA, bearingB) {
+        var difference = Math.abs(bearingA - bearingB);
+        return difference > 180 ? 360 - difference : difference;
     };
 
     /*@
@@ -113,6 +134,14 @@
         ).map(function(bearing) {
             return Ox.getPoint(center, radius, bearing);
         });
+    };
+
+    // FIXME: name, docs
+    Ox.getClosestBearing = function(bearing, bearings) {
+        var differences = bearings.map(function(bearing_) {
+            return getBearingDifference(bearing, bearing_);
+        });
+        return bearings[differences.indexOf(Ox.min(differences))];
     };
 
     /*@

@@ -222,7 +222,7 @@ Ox.decodeDeflate = function(string, callback) {
     // Unfortunately, we can't synchronously set the source of an image,
     // draw it onto a canvas, and read its data.
     image.onload = function() {
-        string = Ox.toArray(Ox.canvas(image).data).map(function(value, index) {
+        string = Ox.slice(Ox.canvas(image).data).map(function(value, index) {
             // Read one character per RGB byte, ignore ALPHA.
             return index % 4 < 3 ? Ox.char(value) : '';
         }).join('');

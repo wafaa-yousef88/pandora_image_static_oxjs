@@ -424,6 +424,7 @@ Forms
     background-image: linear-gradient(top, $buttonDisabledGradient);
     color: $buttonDisabledColor;    
 }
+
 .$themeClass .OxButton.OxSymbol,
 .$themeClass .OxButton.OxSymbol:active,
 .$themeClass .OxButton.OxSymbol.OxDisabled,
@@ -453,11 +454,67 @@ Forms
 .$themeClass .OxSelect.OxSelected.OxColor > .OxButton.OxSelected {
     background: transparent;
 }
-
-
 .$themeClass .OxButton.OxTab.OxSelected {
     border-bottom: 1px solid $buttonSelectedGradient[1];
 }
+
+
+.$themeClass .OxButton.OxOverlay {
+    border-color: $formelementOverlayBorder;
+    background-image: -moz-linear-gradient(top, $buttonOverlayGradient);
+    background-image: -ms-linear-gradient(top, $buttonOverlayGradient);
+    background-image: -o-linear-gradient(top, $buttonOverlayGradient);
+    background-image: -webkit-linear-gradient(top, $buttonOverlayGradient);
+    background-image: linear-gradient(top, $buttonOverlayGradient);
+    color: $formelementOverlayColor;
+    -moz-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -ms-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -o-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -webkit-box-shadow: 0 0 2px $formelementOverlayShadow;
+    box-shadow: 0 0 2px $formelementOverlayShadow;
+}
+.$themeClass .OxButton.OxOverlay:active {
+    border-color: $formelementOverlayBorder;
+    background-image: -moz-linear-gradient(top, $buttonOverlayActiveGradient);
+    background-image: -ms-linear-gradient(top, $buttonOverlayActiveGradient);
+    background-image: -o-linear-gradient(top, $buttonOverlayActiveGradient);
+    background-image: -webkit-linear-gradient(top, $buttonOverlayActiveGradient);
+    background-image: linear-gradient(top, $buttonOverlayActiveGradient);
+    color: $buttonOverlayActiveColor;
+}
+.$themeClass .OxButton.OxOverlay.OxDisabled {
+    background-image: -moz-linear-gradient(top, $buttonOverlayDisabledGradient);
+    background-image: -ms-linear-gradient(top, $buttonOverlayDisabledGradient);
+    background-image: -o-linear-gradient(top, $buttonOverlayDisabledGradient);
+    background-image: -webkit-linear-gradient(top, $buttonOverlayDisabledGradient);
+    background-image: linear-gradient(top, $buttonOverlayDisabledGradient);
+    color: $buttonOverlayDisabledColor;
+}
+.$themeClass .OxButton.OxOverlay.OxSelected {
+    background-image: -moz-linear-gradient(top, $buttonOverlaySelectedGradient);
+    background-image: -ms-linear-gradient(top, $buttonOverlaySelectedGradient);
+    background-image: -o-linear-gradient(top, $buttonOverlaySelectedGradient);
+    background-image: -webkit-linear-gradient(top, $buttonOverlaySelectedGradient);
+    background-image: linear-gradient(top, $buttonOverlaySelectedGradient);
+    color: $buttonOverlaySelectedColor;
+}
+.$themeClass .OxButtonGroup.OxOverlay {
+    height: 16px;
+    border-radius: 8px;
+    -moz-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -ms-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -o-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -webkit-box-shadow: 0 0 2px $formelementOverlayShadow;
+    box-shadow: 0 0 2px $formelementOverlayShadow;
+}
+.$themeClass .OxButtonGroup.OxOverlay .OxButton {
+    -moz-box-shadow: 0 0 0 transparent;
+    -ms-box-shadow: 0 0 0 transparent;
+    -0-box-shadow: 0 0 0 transparent;
+    -webkit-box-shadow: 0 0 0 transparent;
+    box-shadow: 0 0 0 transparent;
+}
+
 
 .$themeClass .OxFileInput.OxDisabled > .OxBar {
     background-image: -moz-linear-gradient(top, $buttonDisabledGradient);
@@ -472,14 +529,6 @@ Forms
 
 .$themeClass .OxFormMessage {
     color: $inputErrorColor;
-}
-
-.$themeClass .OxLabel.OxDisabled {
-    color: $labelDisabledColor;
-}
-.$themeClass .OxDocPage .OxLabel.OxSquare,
-.$themeClass .OxExamplePage .OxLabel.OxSquare {
-    background-color: $documentLabelBackground;
 }
 
 .$themeClass input.OxCheckbox,
@@ -523,6 +572,19 @@ Forms
 
 .$themeClass .OxLabel {
     background-color: $labelBackground;
+}
+.$themeClass .OxLabel.OxDisabled {
+    color: $labelDisabledColor;
+}
+.$themeClass .OxLabel.OxOverlay {
+    background-color: $labelOverlayBackground;
+}
+.$themeClass .OxLabel.OxOverlay.OxDisabled {
+    color: $labelOverlayDisabledColor;
+}
+.$themeClass .OxDocPage .OxLabel.OxSquare,
+.$themeClass .OxExamplePage .OxLabel.OxSquare {
+    background-color: $documentLabelBackground;
 }
 
 .$themeClass input.OxCheckbox.OxDisabled,
@@ -579,6 +641,35 @@ Forms
 .$themeClass .OxEditableContent.OxPlaceholder,
 .$themeClass .OxEditableElement.OxPlaceholder .OxValue {
     color: $inputPlaceholderColor;
+}
+
+/*
+================================================================================
+ImageViewer
+================================================================================
+*/
+
+.$themeClass .OxImageViewer .OxImageOverview {
+    border-color: $formelementOverlayBorder;
+    -moz-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -ms-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -o-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -webkit-box-shadow: 0 0 2px $formelementOverlayShadow;
+    box-shadow: 0 0 2px $formelementOverlayShadow;
+}
+.$themeClass .OxImageViewer .OxImageOverlayArea {
+    background-color: $labelOverlayBackground;
+    background-image: none;
+}
+.$themeClass .OxImageViewer #OxImageOverlayCenter {
+    border-color: $formelementOverlayBorder;
+    background: transparent;
+    background-image: none;
+    -moz-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -ms-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -o-box-shadow: 0 0 2px $formelementOverlayShadow;
+    -webkit-box-shadow: 0 0 2px $formelementOverlayShadow;
+    box-shadow: 0 0 2px $formelementOverlayShadow;
 }
 
 /*

@@ -45,7 +45,7 @@ Ox.App = function(options) {
             location: {href: location.href},
             navigator: {
                 cookieEnabled: navigator.cookieEnabled,
-                plugins: Ox.toArray(navigator.plugins).map(function(plugin) {
+                plugins: Ox.slice(navigator.plugins).map(function(plugin) {
                     return plugin.name;
                 }),
                 userAgent: navigator.userAgent

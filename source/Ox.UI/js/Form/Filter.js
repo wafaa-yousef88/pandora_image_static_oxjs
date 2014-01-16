@@ -483,7 +483,7 @@ Ox.Filter = function(options, self) {
                 }),
             Ox.Button({
                     id: 'add',
-                    title: Ox._('add'),
+                    title: 'add',
                     tooltip: Ox._('Add a condition'),
                     type: 'image'
                 })
@@ -504,7 +504,7 @@ Ox.Filter = function(options, self) {
         ], subpos == -1 ? [
             Ox.Button({
                     id: 'addgroup',
-                    title: Ox._('bracket'),
+                    title: 'bracket',
                     tooltip: Ox._('Add a group of conditions'),
                     type: 'image'
                 })

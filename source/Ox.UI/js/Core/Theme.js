@@ -20,7 +20,7 @@ Ox.Theme = (function() {
         classNames && Ox.forEach(classNames.split(' '), function(className) {
             if (Ox.startsWith(className, 'OxTheme')) {
                 theme = className.replace('OxTheme', '');
-                theme = theme[0].toLowerCase() + theme.substr(1);
+                theme = theme[0].toLowerCase() + theme.slice(1);
                 return false; // break
             }
         });

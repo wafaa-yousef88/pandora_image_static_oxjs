@@ -25,8 +25,30 @@ Ox.clean = function(string) {
 };
 
 /*@
+Ox.codePointAt <f> Returns the code point at a given index
+    (string, index) -> <n> Code point
+    > Ox.codePointAt('\uD83D\uDCA9', 0)
+    0x1F4A9
+@*/
+Ox.codePointAt = function(string, index) {
+    var first, length = string.length, ret, second;
+    if (index >= 0 && index < length) {
+        first = string.charCodeAt(index);
+        if (first < 0xD800 || first > 0xDBFF || index == length - 1) {
+            ret = first;
+        } else {
+            second = string.charCodeAt(index + 1);
+            ret = second < 0xDC00 || second > 0xDFFF ? first
+                : ((first - 0xD800) * 0x400) + (second - 0xDC00) + 0x10000;
+        }
+    }
+    return ret;
+};
+
+/*@
 Ox.endsWith <f> Tests if a string ends with a given substring
-    Equivalent to `new RegExp(Ox.escapeRegExp(substring) + '$').test(string)`.
+    Equivalent to (but faster than)
+    `new RegExp(Ox.escapeRegExp(substring) + '$').test(string)`.
     (string, substring) -> <b> True if string ends with substring
     > Ox.endsWith('foobar', 'bar')
     true
@@ -37,6 +59,31 @@ Ox.endsWith = function(string, substring) {
     string = string.toString();
     substring = substring.toString();
     return string.slice(string.length - substring.length) == substring;
+};
+
+/*@
+Ox.fromCodePoint <f> Returns a string for one or more given code points
+    (codePoint[, codePoint[, ...]]) -> <s> String
+    > Ox.fromCodePoint(102, 111, 111)
+    'foo'
+    > Ox.fromCodePoint(0x1F4A9)
+    '\uD83D\uDCA9'
+@*/
+Ox.fromCodePoint = function() {
+    var ret = '';
+    Ox.forEach(arguments, function(number) {
+        if (number < 0 || number > 0x10FFFF || !Ox.isInt(number)) {
+            throw new RangeError();
+        }
+        if (number < 0x10000) {
+            ret += String.fromCharCode(number);
+        } else {
+            number -= 0x10000;
+            ret += String.fromCharCode((number >> 10) + 0xD800)
+                + String.fromCharCode((number % 0x400) + 0xDC00);
+        }
+    });
+    return ret;
 };
 
 /*@
@@ -377,6 +424,8 @@ Ox.repeat <f> Repeat a value multiple times
     > Ox.repeat([{k: 'v'}], 3)
     [{k: 'v'}, {k: 'v'}, {k: 'v'}]
 @*/
+// FIXME: see https://github.com/paulmillr/es6-shim/blob/master/es6-shim.js
+// for a faster version
 Ox.repeat = function(value, times) {
     var ret;
     if (Ox.isArray(value)) {
@@ -403,7 +452,8 @@ Ox.splice = function(string, index, remove) {
 
 /*@
 Ox.startsWith <f> Tests if a string ends with a given substring
-    Equivalent to `new RegExp('^' + Ox.escapeRegExp(substring)).test(string)`.
+    Equivalent to (but faster than)
+    `new RegExp('^' + Ox.escapeRegExp(substring)).test(string)`.
     (string, substring) -> <b> True if string starts with substring
     > Ox.startsWith('foobar', 'foo')
     true

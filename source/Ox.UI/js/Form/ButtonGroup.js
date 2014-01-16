@@ -47,6 +47,7 @@ Ox.ButtonGroup = function(options, self) {
             })
             .addClass(
                 'OxButtonGroup'
+                + (self.options.style != 'default' ? ' Ox' + Ox.toTitleCase(self.options.style) : '')
                 + (self.options.overlap != 'none' ? ' OxOverlap' + Ox.toTitleCase(self.options.overlap) : '')
             );
 

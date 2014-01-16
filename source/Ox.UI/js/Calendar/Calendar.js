@@ -1286,7 +1286,7 @@ Ox.Calendar = function(options, self) {
         {id, {key: value, ...}} -> <o> Calendar object
     @*/
     that.editEvent = function() {
-        var args = Ox.toArray(arguments),
+        var args = Ox.slice(arguments),
             id = args.shift(),
             data = Ox.makeObject(args),
             event = Ox.getObjectById(self.options.events, id),

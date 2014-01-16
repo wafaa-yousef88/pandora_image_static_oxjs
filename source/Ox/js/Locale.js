@@ -33,6 +33,7 @@
                 translations = {};
                 callback(true);
             } else {
+                translations = {};
                 Ox.forEach(Ox.LOCALES, function(locales, module) {
                     if (
                         (!module || Ox.load[module])
@@ -48,8 +49,8 @@
                     urls.push(Ox.makeArray(value));
                 });
                 Ox.getJSON(urls, function(data) {
-                    urls.forEach(function(url) {
-                        Ox.extend(translations, data[url]);
+                    Ox.forEach(data, function(values, url) {
+                        Ox.extend(translations, values);
                     });
                     callback(true);
                 });

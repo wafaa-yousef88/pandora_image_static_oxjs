@@ -85,9 +85,9 @@ Ox.DocPage = function(options, self) {
     });
 
     function getItem(item, level, name) {
-        Ox.Log('Core', 'getItem', item, level, name)
+        Ox.Log('Core', 'getItem', item, level, name);
         var $elements = [
-                $('<div>')
+                Ox.$('<div>')
                     .css({paddingLeft: (level ? level * 32 - 16 : 0) + 'px'})
                     .html(
                         '<code><b>' + (name || item.name) + '</b> '
@@ -124,7 +124,7 @@ Ox.DocPage = function(options, self) {
                 isExpanded = !Ox.contains(section, 'inherited');
             if (item[section]) {
                 if (section == 'description') {
-                    $elements.push($('<div>')
+                    $elements.push(Ox.$('<div>')
                         .css({
                             paddingTop: (level ? 0 : 8) + 'px',
                             borderTopWidth: level ? 0 : '1px',
@@ -134,7 +134,7 @@ Ox.DocPage = function(options, self) {
                         .html(Ox.sanitizeHTML(item.description))
                     );
                 } else {
-                    $elements.push($('<div>')
+                    $elements.push(Ox.$('<div>')
                         .css({
                             paddingTop: (level ? 0 : 8) + 'px',
                             borderTopWidth: level ? 0 : '1px',
@@ -142,7 +142,7 @@ Ox.DocPage = function(options, self) {
                             marginLeft: (level * 32) + 'px'
                         })
                         .append(
-                            $('<img>')
+                            Ox.$('<img>')
                                 .attr({
                                     src: isExpanded
                                         ? Ox.UI.getImageURL('symbolDown')
@@ -153,44 +153,50 @@ Ox.DocPage = function(options, self) {
                                     height: '12px',
                                     margin: '0 4px -1px 0'
                                 })
-                                .click(function() {
-                                    var $this = $(this),
-                                        isExpanded = $this.attr('src') == Ox.UI.getImageURL('symbolRight');
-                                    $this.attr({
-                                        src: isExpanded
-                                            ? Ox.UI.getImageURL('symbolDown')
-                                            : Ox.UI.getImageURL('symbolRight')
-                                    });
-                                    $('.' + className).each(function() {
-                                        var $this = $(this), isHidden = false;
-                                        $this[isExpanded ? 'removeClass' : 'addClass'](className + 'Hidden');
-                                        if (isExpanded) {
-                                            Ox.forEach(this.className.split(' '), function(v) {
-                                                if (/Hidden$/.test(v)) {
-                                                    isHidden = true;
-                                                    return false; // break
-                                                }
-                                            });
-                                            !isHidden && $this.show();
-                                        } else {
-                                            $this.hide();
-                                        }
-                                    });
+                                .on({
+                                    click: function() {
+                                        var $this = $(this),
+                                            isExpanded = $this.attr('src') == Ox.UI.getImageURL('symbolRight');
+                                        $this.attr({
+                                            src: isExpanded
+                                                ? Ox.UI.getImageURL('symbolDown')
+                                                : Ox.UI.getImageURL('symbolRight')
+                                        });
+                                        $('.' + className).each(function() {
+                                            var $this = $(this), isHidden = false;
+                                            $this[isExpanded ? 'removeClass' : 'addClass'](className + 'Hidden');
+                                            if (isExpanded) {
+                                                Ox.forEach(this.className.split(' '), function(v) {
+                                                    if (/Hidden$/.test(v)) {
+                                                        isHidden = true;
+                                                        return false; // break
+                                                    }
+                                                });
+                                                !isHidden && $this.show();
+                                            } else {
+                                                $this.hide();
+                                            }
+                                        });
+                                    }
                                 })
                         )
-                        .append('<span class="OxSection">' + (
-                            Ox.contains(section, 'inherited')
-                                ? section[0].toUpperCase() + section.slice(1)
-                                : Ox.toTitleCase(
-                                    section == 'returns' ? 'usage' : section
+                        .append(
+                            Ox.$('<span>')
+                                .addClass('OxSection')
+                                .html(
+                                    Ox.contains(section, 'inherited')
+                                        ? section[0].toUpperCase() + section.slice(1)
+                                        : Ox.toTitleCase(
+                                            section == 'returns' ? 'usage' : section
+                                        )
                                 )
-                        ) + '</span>')
+                        )
                     );
                     if (section == 'tests') {
                         item.tests.forEach(function(test) {
                             var isAsync = test.expected && /(.+Ox\.test\()/.test(test.statement);
                             $elements.push(
-                                $('<div>')
+                                Ox.$('<div>')
                                     .addClass(className)
                                     .css({marginLeft: (level * 32 + 16) + 'px'})
                                     .html(
@@ -211,7 +217,7 @@ Ox.DocPage = function(options, self) {
                             );
                             if (test.expected) {
                                 $elements.push(
-                                    $('<div>')
+                                    Ox.$('<div>')
                                         .addClass(className)
                                         .css({marginLeft: (level * 32 + 16) + 'px'})
                                         .html(
@@ -234,7 +240,7 @@ Ox.DocPage = function(options, self) {
                         });
                     } else if (section == 'source') {
                         // fixme: not the right place to fix path
-                        $elements.push($('<div>')
+                        $elements.push(Ox.$('<div>')
                             .addClass(className)
                             .css({marginLeft: 16 + 'px'})
                             .html(

@@ -71,7 +71,7 @@ Ox.Checkbox = function(options, self) {
                 width: getTitleWidth()
             })
             .css({float: 'right'})
-            .click(clickTitle)
+            .on({click: clickTitle})
             .appendTo(that);
     }
 

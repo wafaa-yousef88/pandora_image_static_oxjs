@@ -26,10 +26,6 @@ Ox.Message = (function() {
 
     // Defined here so one can just load Message.js in addtion to Ox.js
     Ox.$parent = {
-        postMessage: function(event, message) {
-            Ox.Message.post(Ox.$parent, event, message);
-            return this;
-        },
         onMessage: function() {
             var callback;
             if (Ox.isObject(arguments[0])) {
@@ -48,6 +44,10 @@ Ox.Message = (function() {
                     }
                 });
             }
+            return this;
+        },
+        postMessage: function(event, message) {
+            Ox.Message.post(Ox.$parent, event, message);
             return this;
         }
     };
@@ -75,8 +75,8 @@ Ox.Message = (function() {
             : Ox.isElement(target[0]) ? target[0].contentWindow
             : Ox.$('#' + target)[0].contentWindow;
         target.postMessage(JSON.stringify({
-            event: event,
             data: data,
+            event: event,
             oxid: window.oxid
         }), '*');
         return that;

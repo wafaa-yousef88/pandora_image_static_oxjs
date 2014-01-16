@@ -28,11 +28,11 @@ Ox.Editable = function(options, self) {
             editable: true,
             editing: false,
             format: null,
+            globalAttributes: [],
             height: 0,
             highlight: null,
             maxHeight: void 0,
             placeholder: '',
-            replaceTags: {},
             submitOnBlur: true,
             tags: null,
             tooltip: '',
@@ -230,7 +230,7 @@ Ox.Editable = function(options, self) {
         return (
             self.options.type == 'input'
             ? Ox.encodeHTMLEntities(value)
-            : Ox.sanitizeHTML(value, self.options.tags, self.options.replaceTags)
+            : Ox.sanitizeHTML(value, self.options.tags, self.options.globalAttributes)
         );
     }
 

@@ -79,7 +79,7 @@ Ox.MapEditor = function(options, self) {
         {
             format: function(value, data) {
                 return data.type
-                    ? $('<img>')
+                    ? Ox.$('<img>')
                         .attr({
                             src: Ox.getFlagByGeoname(data.geoname, 16)
                         })
@@ -121,7 +121,7 @@ Ox.MapEditor = function(options, self) {
                     }
                 });
                 return data.type
-                    ? $('<div>')
+                    ? Ox.$('<div>')
                         .addClass('OxTypeIcon')
                         .css({
                             width: iconSize + 'px',
@@ -148,7 +148,7 @@ Ox.MapEditor = function(options, self) {
             format: function(value, data) {
                 return data.type
                     ? value
-                    : $('<span>').addClass('OxWarning').html(value);
+                    : Ox.$('<span>').addClass('OxWarning').html(value);
             },
             id: 'name',
             operator: '+',
@@ -427,7 +427,7 @@ Ox.MapEditor = function(options, self) {
     self.$placeTitlebar = Ox.Bar({
         size: 24
     });
-    self.$placeTitle = $('<div>')
+    self.$placeTitle = Ox.$('<div>')
         .hide()
         .appendTo(self.$placeTitlebar);
     if (self.options.mode == 'define') {
@@ -443,7 +443,7 @@ Ox.MapEditor = function(options, self) {
             .hide()
             .appendTo(self.$placeTitle);
     }
-    self.$placeFlag = $('<img>')
+    self.$placeFlag = Ox.$('<img>')
         .addClass('OxFlag')
         .attr({
             src: Ox.getFlagByGeoname('', 16)

@@ -58,7 +58,7 @@ Ox.Event = (function() {
             Event names can be namespaced, like `'click.foo'`
     */
     that.bind = function() {
-        var args = Ox.toArray(arguments), once, self;
+        var args = Ox.slice(arguments), once, self;
         if (args.length == 1) {
             eventHandlers.push(args[0])
         } else {

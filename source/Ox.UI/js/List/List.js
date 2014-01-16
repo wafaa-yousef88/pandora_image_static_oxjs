@@ -96,7 +96,8 @@ Ox.List = function(options, self) {
                     } else {
                         if (Ox.isArray(self.options.items)) {
                             // FIXME: duplicated
-                            self.options.items = Ox.api(self.options.items, {
+                            self.items = self.options.items;
+                            self.options.items = Ox.api(self.items, {
                                 cache: true,
                                 map: self.options.map,
                                 sort: self.options.sort,
@@ -131,7 +132,8 @@ Ox.List = function(options, self) {
     });
 
     if (Ox.isArray(self.options.items) && !self.options._tree) {
-        self.options.items = Ox.api(self.options.items, {
+        self.items = self.options.items;
+        self.options.items = Ox.api(self.items, {
             cache: true,
             map: self.options.map,
             sort: self.options.sort,
@@ -159,6 +161,7 @@ Ox.List = function(options, self) {
     });
     self.options.draggable && updateDraggable();
     self.options.sortable && updateSortable();
+
     // fixme: without this, horizontal lists don't get their full width
     self.options.orientation == 'horizontal' && that.$content.css({height: '1px'});
 
@@ -293,6 +296,7 @@ Ox.List = function(options, self) {
             scrollToPosition(pos);
         }
     }
+
     function addAllToSelection(pos) {
         var arr, i, len = self.$items.length;
         if (!isSelected(pos)) {
@@ -802,6 +806,7 @@ Ox.List = function(options, self) {
         }
         return $element.is('.OxSpecialTarget');
     }
+
     function loadItems() {
         self.$pages[0].empty();
         self.$items = [];
@@ -1791,34 +1796,37 @@ Ox.List = function(options, self) {
 
     /*@
     value <f> get/set list value
+        (id, {key: value, ...}) -> <f> sets value, returns List Element
         (id, key, value) -> <f> sets value, returns List Element
         (id, key) -> <a> returns value
         (id) -> <o> returns all values of id
-        id <s> id of item
+        id <s|n> id of item (or a number, will be interpreted as position)
         key <s> key if item property
         value <*> value, can be whatever that property is
     @*/
-    // FIXME: this should accept {key: value, ...} too
-    that.value = function(id, key, value) {
-        // id can be a number and will then be interpreted as position
-        var pos = Ox.isNumber(id) ? id : getPositionById(id),
+    that.value = function() {
+        var args = Ox.slice(arguments),
+            id = args.shift(),
+            pos = Ox.isNumber(id) ? id : getPositionById(id),
             $item = self.$items[pos],
             data = $item ? $item.options('data') : {};
         if (arguments.length == 1) {
             return data;
-        } else if (arguments.length == 2) {
-            return data[key];
+        } else if (arguments.length == 2 && Ox.isString(arguments[1])) {
+            return data[arguments[1]];
         } else if ($item) {
-            if (key == self.options.unique) {
-                // unique id has changed
-                self.options.selected = self.options.selected.map(function(id_) {
-                    return id_ == data[key] ? value : id_
-                });
-            }
-            if (!self.isAsync) {
-                self.options.items[pos][key] = value;
-            }
-            data[key] = value;
+            Ox.forEach(Ox.makeObject(args), function(value, key) {
+                if (key == self.options.unique) {
+                    // unique id has changed
+                    self.options.selected = self.options.selected.map(function(id_) {
+                        return id_ == data[key] ? value : id_
+                    });
+                }
+                if (!self.isAsync) {
+                    self.options.items[pos][key] = value;
+                }
+                data[key] = value;
+            });
             $item.options({data: data});
             return that;
         }

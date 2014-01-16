@@ -53,19 +53,25 @@ Ox.Element <f> Basic UI element object
             clientDX <n> Horizontal drag delta in px
             clientDY <n> Vertical drag delta in px
             * <*> Original event properties
+        dragstart <!> dragstart
+            Fires when the mouse is down for 250 ms
+            * <*> Original event properties
         mousedown <!> mousedown
             Fires on mousedown (this is useful if one wants to listen for
             singleclicks, but not doubleclicks or drag events, and wants the
             event to fire as early as possible)
-            * <*> Original event properties
-        dragstart <!> dragstart
-            Fires when the mouse is down for 250 ms
             * <*> Original event properties
         mouserepeat <!> mouserepeat
             Fires every 50 ms after the mouse was down for 250 ms, stops firing
             on mouseleave or mouseup (this fires like a key that is being
             pressed and held, and is useful for buttons like scrollbars arrows
             that need to react to both clicking and holding)
+        mousewheel <!> mousewheel
+            Fires on mousewheel scroll or trackpad swipe
+            deltaFactor <n> Original delta = normalized delta * delta factor
+            deltaX <n> Normalized horizontal scroll delta in px
+            deltaY <n> Normalized vertical scroll delta in px
+            * <*> Original event properties
         singleclick <!> singleclick
             Fires 250 ms after mouseup, if there was no subsequent mousedown
             (this is useful if one wants to listen for both singleclicks and
@@ -87,12 +93,15 @@ Ox.Element = function(options, self) {
     // create public object
     var that = new Ox.JQueryElement($(self.options.element || '<div>'))
         .addClass('OxElement')
-        .on({mousedown: mousedown});
-    if (self.options.element == '<iframe>') {
-        that.on('load', function() {
-            Ox.Message.post(that, 'init', {id: that.oxid});
-        });
-    }
+        .on(Ox.extend({
+            mousedown: mousedown,
+            mousewheel: mousewheel
+        }, self.options.element == '<iframe>' ? {
+            load: function() {
+                Ox.Message.post(that, 'init', {id: that.oxid});
+            }
+        } : {}));
+
     setTooltip();
 
     function mousedown(e) {
@@ -118,9 +127,9 @@ Ox.Element = function(options, self) {
         var clientX, clientY,
             dragTimeout = 0,
             mouseInterval = 0;
+        that.triggerEvent('mousedown', e);
         if (!self._mouseTimeout) {
             // first mousedown
-            that.triggerEvent('mousedown', e);
             self._drag = false;
             self._mouseup = false;
             self._mouseTimeout = setTimeout(function() {
@@ -147,7 +156,7 @@ Ox.Element = function(options, self) {
                     clientY = e.clientY;
                     Ox.UI.$window
                         .off('mouseup', mouseup)
-                        .mousemove(mousemove)
+                        .on({mousemove: mousemove})
                         .one('mouseup', function(e) {
                             // stop checking for mouserepeat
                             clearInterval(mouseInterval);
@@ -218,6 +227,39 @@ Ox.Element = function(options, self) {
         that.$tooltip.options({title: self.options.tooltip(e)}).show(e);
     }
 
+    function mousewheel(e) {
+        // see https://github.com/brandonaaron/jquery-mousewheel/blob/master/jquery.mousewheel.js
+        e = e.originalEvent;
+        var absDelta,
+            deltaX = 'deltaX' in e ? e.deltaX
+                : 'wheelDeltaX' in e ? -e.wheelDeltaX
+                : 0,
+            deltaY = 'deltaY' in e ? -e.deltaY
+                : 'wheelDeltaY' in e ? e.wheelDeltaY
+                : 'wheelDelta' in e ? e.wheelDelta
+                : 0;
+        // Firefox < 17
+        if ('axis' in e && e.axis === e.HORIZONTAL_AXIS) {
+            deltaX = -deltaY;
+            deltaY = 0;
+        }
+        if (deltaX || deltaY) {
+            absDelta = Math.max(Math.abs(deltaY), Math.abs(deltaX));
+            if (!self._deltaFactor || self._deltaFactor > absDelta) {
+                self._deltaFactor = absDelta;
+            }
+            that.triggerEvent('mousewheel', Ox.extend(e, {
+                deltaFactor: self._deltaFactor,
+                deltaX: Ox.trunc(deltaX / self._deltaFactor),
+                deltaY: Ox.trunc(deltaY / self._deltaFactor)
+            }));
+            clearTimeout(self._deltaTimeout)
+            self._deltaTimeout = setTimeout(function() {
+                self._deltaFactor = null;
+            }, 200);
+        }
+    }
+
     // TODO: in other widgets, use this,
     // rather than some self.$tooltip that
     // will not get garbage collected
@@ -258,7 +300,7 @@ Ox.Element = function(options, self) {
         (event, callback) -> <o> This element
             Adds a handler for a single event
         ({event: callback, ...}) -> <o> This element
-            Adds handlers for multiple events
+            Adds handlers for one or more events
         callback <f> Callback function
             data <o> event data (key/value pairs)
         event <s> Event name
@@ -276,7 +318,7 @@ Ox.Element = function(options, self) {
         (event, callback) -> <o> This element
             Adds a handler for a single event
         ({event: callback, ...}) -> <o> This element
-            Adds handlers for multiple events
+            Adds handlers for one or more events
         callback <f> Callback function
             data <o> event data (key/value pairs)
         event <s> Event name
@@ -288,12 +330,55 @@ Ox.Element = function(options, self) {
     };
 
     /*@
+    bindMessage <f> Adds message handlers (if the element is an iframe)
+        (callback) -> <o> This element
+            Adds a catch-all handler
+        (event, callback) -> <o> This element
+            Adds a handler for a single event
+        ({event: callback, ...}) -> <o> This element
+            Adds handlers for on or more events
+        callback <f> Callback function
+            data <o> event data (key/value pairs)
+        event <s> Event name
+    @*/
+    that.bindMessage = that.onMessage = function() {
+        var callback;
+        if (self.options.element == '<iframe>') {
+            if (Ox.isObject(arguments[0])) {
+                Ox.forEach(arguments[0], function(callback, event) {
+                    Ox.Message.bind(arguments[0], function(event_, data, oxid) {
+                        if (event_ == event && oxid == that.oxid) {
+                            callback(data || {});
+                        }
+                    });
+                });
+            } else {
+                callback = arguments[0];
+                Ox.Message.bind(function(event, data, oxid) {
+                    if (that.oxid == oxid) {
+                        callback(event, data || {});
+                    }
+                });
+            }
+        }
+        return that;
+    };
+
+    that.bindMessageOnce = function() {
+        
+    };
+
+    /*@
     bindKeyboard <f> bind keyboard
         () -> <o> object
     @*/
     that.bindKeyboard = function() {
         Ox.Keyboard.bind(that.oxid);
         return that;
+    };
+
+    that.childrenElements = function() {
+        return that.children().filter(Ox.UI.isOxElement).map(Ox.UI.getOxElement);
     };
 
     /*@
@@ -314,6 +399,10 @@ Ox.Element = function(options, self) {
             ret = that;
         }
         return ret;
+    };
+
+    that.findElements = function() {
+        return Ox.map(that.find('.OxElement'), Ox.UI.getOxElement);
     };
 
     /*@
@@ -342,40 +431,12 @@ Ox.Element = function(options, self) {
         return that;
     };
 
-    /*@
-    onMessage <f> Adds message handlers (if the element is an iframe)
-        (callback) -> <o> This element
-            Adds a catch-all handler
-        (event, callback) -> <o> This element
-            Adds a handler for a single event
-        ({event: callback, ...}) -> <o> This element
-            Adds handlers for multiple events
-        callback <f> Callback function
-            data <o> event data (key/value pairs)
-        event <s> Event name
-    @*/
-    that.onMessage = function() {
-        // FIXME: Implement catch-all handler
-        var callback;
-        if (self.options.element == '<iframe>') {
-            if (Ox.isObject(arguments[0])) {
-                Ox.forEach(arguments[0], function(callback, event) {
-                    Ox.Message.bind(arguments[0], function(event_, data, oxid) {
-                        if (event_ == event && oxid == that.oxid) {
-                            callback(data || {});
-                        }
-                    });
-                });
-            } else {
-                callback = arguments[0];
-                Ox.Message.bind(function(event, data, oxid) {
-                    if (that.oxid == oxid) {
-                        callback(event, data || {});
-                    }
-                });
-            }
-        }
-        return that;
+    that.nextElement = function() {
+        return that.nextElements()[0];
+    };
+
+    that.nextElements = function() {
+        return that.nextAll().filter(Ox.UI.isOxElement).map(Ox.UI.getOxElement);
     };
 
     /*@
@@ -386,13 +447,21 @@ Ox.Element = function(options, self) {
             Sets options[key] to value and calls update(key, value)
             if the key/value pair was added or modified
         ({key: value, ...}) -> <o> This element
-            Sets multiple options and calls update(key, value)
+            Sets one or more options and calls update(key, value)
             for every key/value pair that was added or modified
         key <s> The name of the option
         value <*> The value of the option
     @*/
     that.options = function() {
         return Ox.getset(self.options, arguments, update, that);
+    };
+
+    that.parentElement = function() {
+        return Ox.last(that.parentElements());
+    };
+
+    that.parentElements = function() {
+        return that.parents().filter(Ox.UI.isOxElement).map(Ox.UI.getOxElement);
     };
 
     /*@
@@ -404,12 +473,20 @@ Ox.Element = function(options, self) {
     that.postMessage = function(event, data) {
         if (self.options.element == '<iframe>') {
             Ox.Message.post(that, event, data);
-            return that;
         }
+        return that;
+    };
+
+    that.prevElement = function() {
+        return Ox.last(that.prevElements());
+    };
+
+    that.prevElements = function() {
+        return that.prevAll().filter(Ox.UI.isOxElement).map(Ox.UI.getOxElement);
     };
 
     /*@
-    removeElement <f> Removes an element object and its event handler
+    remove <f> Removes an element object and its event handler
         () -> <o> This element
     @*/
     that.remove = function(remove) {
@@ -424,6 +501,24 @@ Ox.Element = function(options, self) {
         remove !== false && that.$element.remove();
         return that;
     };
+
+    /*
+    that.remove = function() {
+        [that].concat(that.find('.OxElement'))
+            .map(Ox.UI.getOxElement).forEach(function($element) {
+                $element.removeElement();
+            });
+        that[0].parentNode.removeChild(this[0]);
+        return that;
+    }
+
+    that.removeElement = function() {
+        delete Ox.$elements[that.oxid];
+        Ox.Focus.remove(that);
+        self.unbindKeyboard();
+        return that;
+    };
+    */
 
     /*@
     setElement <f> set $element
@@ -443,7 +538,7 @@ Ox.Element = function(options, self) {
     @*/
     that.toggleOption = function() {
         var options = {};
-        Ox.toArray(arguments).forEach(function(key) {
+        Ox.slice(arguments).forEach(function(key) {
             options[key] == !self.options[key];
         });
         that.options(options);
@@ -457,13 +552,17 @@ Ox.Element = function(options, self) {
         (event, data) -> <o> This element object
             Triggers an event with data
         ({event: data, ...}) -> <o> This element object
-            Triggers multiple events with data
+            Triggers one or more events with data
         event <string> Event name
         data <object> Event data (key/value pairs)
     @*/
     that.triggerEvent = function() {
         Ox.Event.trigger.apply(that, [self].concat(Ox.slice(arguments)));
         return that;
+    };
+
+    that.triggerMessage = function() {
+        
     };
 
     /*@
@@ -478,12 +577,16 @@ Ox.Element = function(options, self) {
         (event, callback) -> <o> This element
             Removes a specific handler for a single event
         ({event: callback}, ...) -> <o> This element
-            Removes specific handlers for multiple events
+            Removes specific handlers for one or more events
         event <string> Event name
     @*/
     that.unbindEvent = function() {
         Ox.Event.unbind.apply(null, [self].concat(Ox.slice(arguments)));
         return that;
+    };
+
+    that.unbindMessage = function() {
+        
     };
 
     /*@

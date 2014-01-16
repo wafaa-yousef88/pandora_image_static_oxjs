@@ -278,6 +278,15 @@ Ox.load.Geo = function(options, callback) {
             return split;
         };
 
+        /*
+        Ox.getScript(
+            'https://maps.googleapis.com/maps/api/js?callback=Ox.GoogleMapsCallback&sensor=false',
+            function() {
+                callback(true);
+            }
+        );
+        */
+
         callback(true);
 
     });

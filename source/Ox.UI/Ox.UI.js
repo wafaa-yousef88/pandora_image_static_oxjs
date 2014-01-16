@@ -261,7 +261,7 @@ Ox.load.UI = function(options, callback) {
         Ox.Theme.getThemeData = function(theme) {
             return themes[theme || Ox.Theme()];
         };
-        $(function() {
+        Ox.documentReady(function() {
             if (options.showScreen && options.hideScreen) {
                 Ox.UI.hideLoadingScreen();
             }
@@ -282,7 +282,7 @@ Ox.load.UI = function(options, callback) {
         @*/
         Ox.UI.ready = (function() {
             var callbacks = [];
-            $(function() {
+            Ox.documentReady(function() {
                 // FIXME: use Ox.$foo everywhere!
                 Ox.$body = Ox.UI.$body = $('body');
                 Ox.$document = Ox.UI.$document = $(document);
@@ -346,7 +346,9 @@ Ox.load.UI = function(options, callback) {
             if (type == 'symbol') {
                 if (Ox.isString(color)) {
                     colorName = color;
-                    color = themeData['symbol' + Ox.toTitleCase(color) + 'Color'];
+                    color = themeData[
+                        'symbol' + color[0].toUpperCase() + color.slice(1) + 'Color'
+                    ];
                 }
                 image = image.replace(/#808080/g, '#' + Ox.toHex(color));
             }
@@ -371,6 +373,10 @@ Ox.load.UI = function(options, callback) {
                 return JSON.stringify(args);
             }
         });
+        // ...
+        Ox.UI.getOxElement = function(element) {
+            return Ox.$elements[Ox.$(element).data('oxid')];
+        };
         /*@
         Ox.UI.hideLoadingScreen <f> hide loading screen
             () -> <u> hide loading screen
@@ -383,8 +389,10 @@ Ox.load.UI = function(options, callback) {
                 opacity: error ? 0.9 : 0
             }, 1000, function() {
                 if (error) {
-                    $div.click(function() {
-                        $div.remove();
+                    $div.on({
+                        click: function() {
+                            $div.remove();
+                        }
                     });
                 } else {
                     clearInterval(loadingInterval);
@@ -399,15 +407,19 @@ Ox.load.UI = function(options, callback) {
         Ox.UI.isElement = function(object) {
             return Ox.isObject(object) && 'oxid' in object;
         };
+        // ...
+        Ox.UI.isOxElement = function(element) {
+            return !!Ox.$(element).attr('data-oxid');
+        };
         //@ Ox.UI.PATH <str> Path of Ox.UI
         Ox.UI.PATH = Ox.PATH + 'Ox.UI/';
         //@ Ox.UI.SCOLLBAR_SIZE <str> size of scrollbar
         Ox.UI.SCROLLBAR_SIZE = $.browser.webkit ? 8 : (function() {
-            var inner = $('<p>').css({
+            var inner = Ox.$('<p>').css({
                     height: '200px',
                     width: '100%'
                 }),
-                outer = $('<div>').css({
+                outer = Ox.$('<div>').css({
                     height: '150px',
                     left: 0,
                     overflow: 'hidden',
@@ -416,8 +428,7 @@ Ox.load.UI = function(options, callback) {
                     visibility: 'hidden',
                     width: '200px'
                 }).append(inner).appendTo($('body')),
-                width;
-            width = inner[0].offsetWidth;
+                width = inner[0].offsetWidth;
             outer.css({overflow: 'scroll'});
             width = 1 + width - (inner[0].offsetWidth == width
                 ? outer[0].clientWidth : inner[0].offsetWidth);
@@ -435,6 +446,7 @@ Ox.load.UI = function(options, callback) {
             return sizes[size];
         };
         //@ Ox.UI.symbols <o> unicode symbols
+        // fixme: these should be part of Ox
         Ox.UI.symbols = {
             alt: '\u2325',
             apple: '\uF8FF',

@@ -40,7 +40,7 @@ Ox.clone = function(collection, deep) {
                 ? Ox.clone(value, true) : value;
         });
     } else {
-        ret = type == 'array' ? collection.slice() : Ox.extend({}, collection)
+        ret = type == 'array' ? collection.slice() : Ox.extend({}, collection);
     }
     return ret;
 };
@@ -138,7 +138,7 @@ Ox.filter = function(collection, iterator, that) {
             }
         });
     } else {
-        ret = Ox.toArray(collection).filter(iterator, that);
+        ret = Ox.slice(collection).filter(iterator, that);
         if (type == 'string') {
             ret = ret.join('');
         }
@@ -182,7 +182,7 @@ Ox.forEach = function(collection, iterator, that) {
             i++;
         }
     } else {
-        collection = Ox.toArray(collection);
+        collection = Ox.slice(collection);
         for (i = 0; i < collection.length; i++) {
             if (
                 i in collection
@@ -254,7 +254,7 @@ Ox.len <f> Returns the length of an array, nodelist, object, storage or string
     > Ox.len(function(a, b, c) {})
     undefined
 @*/
-// FIXME: Ox.size() ?
+// FIXME: rename to Ox.length
 Ox.len = function(collection) {
     var ret, type = Ox.typeOf(collection);
     if (
@@ -289,7 +289,7 @@ Ox.map = function(collection, iterator, that) {
             ret[key] = iterator.call(that, value, key, collection);
         });
     } else {
-        ret = Ox.toArray(collection).map(iterator);
+        ret = Ox.slice(collection).map(iterator);
         if (type == 'string') {
             ret = ret.join('');
         }
@@ -430,7 +430,7 @@ Ox.shuffle = function(collection) {
         });
     } else {
         ret = [];
-        Ox.toArray(collection).forEach(function(value, index) {
+        Ox.slice(collection).forEach(function(value, index) {
             var random = Math.floor(Math.random() * (index + 1));
             ret[index] = ret[random];
             ret[random] = value;
@@ -444,30 +444,52 @@ Ox.shuffle = function(collection) {
 
 /*@
 Ox.slice <f> Alias for `Array.prototype.slice.call`
-    > (function() { return Ox.slice(arguments, 1, -1); }(1, 2, 3))
-    [2]
-    > (function() { return Ox.slice(arguments, 1); }(1, 2, 3))
-    [2, 3]
+    (collection[, start[, stop]]) -> <a> Array
+    collection <a|o|s> Array-like
+    start <n> Start position
+    stop <n> Stop position
+    > (function() { return Ox.slice(arguments); }(1, 2, 3))
+    [1, 2, 3]
+    > Ox.slice('foo', 0, 1);
+    ['f']
+    > Ox.slice({0: 'f', 1: 'o', 2: 'o', length: 3}, -2)
+    ['o', 'o']
 @*/
-Ox.slice = function(value, start, stop) {
-    return Array.prototype.slice.call(value, start, stop);
+// FIXME: remove toArray alias
+Ox.slice = Ox.toArray = function(collection, start, stop) {
+    return Array.prototype.slice.call(collection, start, stop);
 };
-// IE8 returns an empty array if undefined is passed as stop
-// and an array of null values if a string is passed as value.
-// Firefox 3.6 returns an array of undefined values
-// if a string is passed as value.
+// IE8 can't apply slice to NodeLists, returns an empty array if undefined is
+// passed as stop and returns an array of null values if a string is passed as
+// value. Firefox 3.6 returns an array of undefined values if a string is passed
+// as value.
 if (
     Ox.slice([0]).length == 0
     || Ox.slice('0')[0] === null
     || Ox.slice('0')[0] === void 0
+    || !(function() {
+        try {
+            return Ox.slice(document.getElementsByTagName('a'));
+        } catch (error) {}
+    }())
 ) {
-    Ox.slice = function(value, start, stop) {
-        if (Ox.typeOf(value) == 'string') {
-            value = value.split('');
+    // FIXME: remove toArray alias
+    Ox.slice = Ox.toArray = function(collection, start, stop) {
+        var args = stop === void 0 ? [start] : [start, stop],
+            array = [], index, length, ret;
+        if (Ox.typeOf(collection) == 'string') {
+            collection = collection.split('');
         }
-        return stop === void 0
-            ? Array.prototype.slice.call(value, start)
-            : Array.prototype.slice.call(value, start, stop);
+        try {
+            ret = Array.prototype.slice.apply(collection, args);
+        } catch (error) {
+            length = collection.length;
+            for (index = 0; index < length; index++) {
+                array[index] = collection[index];
+            }
+            ret = Array.prototype.slice.apply(array, args);
+        }
+        return ret;
     };
 }
 
@@ -505,7 +527,7 @@ Ox.sum <f> Returns the sum of the values of a collection
 @*/
 Ox.sum = function(collection) {
     var ret = 0;
-    collection = arguments.length > 1 ? Ox.toArray(arguments) : collection;
+    collection = arguments.length > 1 ? Ox.slice(arguments) : collection;
     Ox.forEach(collection, function(value) {
         value = +value;
         ret += isFinite(value) ? value : 0;
@@ -550,7 +572,7 @@ Ox.values <f> Returns the values of a collection
 @*/
 Ox.values = function(collection) {
     var ret, type = Ox.typeOf(collection);
-    if (type == 'array') {
+    if (type == 'array' || type == 'nodelist') {
         ret = Ox.clone(collection);
     } else if (type == 'object' || type == 'storage') {
         ret = [];

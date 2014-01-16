@@ -361,7 +361,7 @@ Ox.Map = function(options, self) {
                 bottom: 0
             })
             .appendTo(that);
-        self.$placeFlag = $('<img>')
+        self.$placeFlag = Ox.$('<img>')
             .addClass('OxFlag')
             .attr({
                 src: Ox.PATH + 'Ox.Geo/png/icons/16/NTHH.png'
@@ -1252,7 +1252,7 @@ Ox.Map = function(options, self) {
                 .data({country: country})
                 .empty()
                 .append(
-                    $('<img>').attr({
+                    Ox.$('<img>').attr({
                         src: Ox.getFlagByGeoname(place.geoname, 16)
                     })
                 )
@@ -1602,7 +1602,7 @@ Ox.Map = function(options, self) {
                 self.$placeControls.name.options({title: value});
             } else if (key == 'geoname') {
                 self.$placeControls.flag.empty().append(
-                    $('<img>').attr({
+                    Ox.$('<img>').attr({
                         src: Ox.getFlagByGeoname(value, 16)
                     })
                 );

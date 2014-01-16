@@ -6,6 +6,7 @@ Ox.Range <f> Range Object
         arrows        <b>          if true, show arrows
         arrowStep     <n>          step when clicking arrows
         arrowSymbols  <[s]>        arrow symbols, like ['minus', 'plus']
+        arrowTooltips <[s]>        arrow tooltips
         max           <n>          maximum value
         min           <n>          minimum value
         orientation   <s>          'horizontal' or 'vertical'
@@ -33,6 +34,7 @@ Ox.Range = function(options, self) {
             arrows: false,
             arrowStep: 1,
             arrowSymbols: ['left', 'right'],
+            arrowTooltips: ['', ''],
             changeOnDrag: false,
             max: 100,
             min: 0,
@@ -86,6 +88,7 @@ Ox.Range = function(options, self) {
             self.$arrows[i] = Ox.Button({
                 overlap: i == 0 ? 'right' : 'left',
                 title: self.options.arrowSymbols[i],
+                tooltip: self.options.arrowTooltips[i],
                 type: 'image'
             })
             .addClass('OxArrow')
@@ -135,8 +138,10 @@ Ox.Range = function(options, self) {
                 .css({
                     width: self.trackImageWidths[i] + 'px'
                 })
-                .mousedown(function(e) {
-                    e.preventDefault(); // prevent drag
+                .on({
+                    mousedown: function(e) {
+                        e.preventDefault(); // prevent drag
+                    }
                 })
                 .appendTo(self.$trackImages);
             //left += self.trackImageWidths[i];
