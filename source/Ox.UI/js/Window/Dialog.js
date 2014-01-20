@@ -175,6 +175,29 @@ Ox.Dialog = function(options, self) {
         }
         return pos;
     }
+    function selectNext() {
+        var pos = getNext();
+        if (pos > -1) {
+            select(pos);
+            scrollToPosition(pos);
+        } else if (self.selected.length) {
+            that.triggerEvent('selectnext');
+        }
+    }
+
+    function selectNone() {
+        deselect(Ox.range(self.listLength));
+    }
+
+    function selectPrevious() {
+        var pos = getPrevious();
+        if (pos > -1) {
+            select(pos);
+            scrollToPosition(pos);
+        } else if (self.selected.length) {
+            that.triggerEvent('selectprevious');
+        }
+    }
 
     setContent();
 
@@ -647,10 +670,10 @@ Ox.Dialog = function(options, self) {
 								//wafaa				
 								//margin: '24px 0 0 335px',	
                 bottom: 0,
-                borderBottomLeftRadius: '8px',
-                borderBottomRightRadius: '8px',
-                borderTopLeftRadius: '8px',
-                borderTopRightRadius: '8px',
+                //borderBottomLeftRadius: '8px',
+                //borderBottomRightRadius: '8px',
+                //borderTopLeftRadius: '8px',
+                //borderTopRightRadius: '8px',
  								top: '10%',
 								left: '24%'										
             })
@@ -659,8 +682,8 @@ Ox.Dialog = function(options, self) {
 						console.log(that);
         !isImage && self.$content.append(
             self.options.content.css(self.hasButtons ? {} : {
-                borderBottomLeftRadius: '8px',
-                borderBottomRightRadius: '8px'
+                //borderBottomLeftRadius: '8px',
+                //borderBottomRightRadius: '8px'
             })
         );
         animate && self.options.content.animate({
