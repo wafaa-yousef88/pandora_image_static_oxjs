@@ -368,9 +368,7 @@ Ox.Dialog = function(options, self) {
         self.maximized = !self.maximized;
 				var item_id = pandora.user.ui.listSelection
 				$('.OxContentImg').attr({src: '/' + item_id + '/' + highReso + 'p.png'});
-				//$('.OxContentImg').addClass("OxImgFullScrn");		
 				$('.OxDialogBar').css({display:'none'});
-				//$('.OxContentImg').removeAttr("css")
 				$('.OxContentImg').css({'left': '', 'top': ''});
 				$('.OxContentImg').css({'left': '11%'});
     }
