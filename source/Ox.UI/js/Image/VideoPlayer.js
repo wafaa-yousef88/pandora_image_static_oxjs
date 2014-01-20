@@ -2283,7 +2283,6 @@ Ox.VideoPlayer = function(options, self) {
                 self.options.resolution = self.resolutions[0];
             }
             self.video = self.options.video[self.options.resolution];
-																						console.log(self.options.video);
         } else {
             self.video = self.options.video;
         }

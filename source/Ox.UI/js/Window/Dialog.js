@@ -367,8 +367,12 @@ Ox.Dialog = function(options, self) {
         }, true);
         self.maximized = !self.maximized;
 				var item_id = pandora.user.ui.listSelection
-				$('.OxContentImg').attr({src: '/' + item_id + '/' + highReso + 'p.png'})
+				$('.OxContentImg').attr({src: '/' + item_id + '/' + highReso + 'p.png'});
+				//$('.OxContentImg').addClass("OxImgFullScrn");		
 				$('.OxDialogBar').css({display:'none'});
+				//$('.OxContentImg').removeAttr("css")
+				$('.OxContentImg').css({'left': '', 'top': ''});
+				$('.OxContentImg').css({'left': '11%'});
     }
 
     function reset(animate) {
@@ -649,8 +653,8 @@ Ox.Dialog = function(options, self) {
                 borderBottomRightRadius: '8px',
                 borderTopLeftRadius: '8px',
                 borderTopRightRadius: '8px',
- 								//top: '3%',
-								left: '11%'										
+ 								top: '10%',
+								left: '24%'										
             })
             .appendTo(that);
 						console.log(self);

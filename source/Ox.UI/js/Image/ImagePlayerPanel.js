@@ -219,9 +219,9 @@ Ox.VideoPlayerPanel = function(options, self) {
 		});
 		$(document).on('click','.gallerryBtn',function(){
 			if (this.id == '720') {
-				$('.ImgPanel').css({"overflow-x": "scroll", "overflow-y": "scroll", "height": "450px", "width": "852px"});
+				$('.ImgPanel').css({"overflow-x": "scroll", "overflow-y": "scroll", "height": "350px", "width": "852px"});
 			} else if (this.id == '480') {
-				$('.ImgPanel').css({"overflow-x": "scroll", "overflow-y": "scroll", "height": "450px", "width": "auto"});
+				$('.ImgPanel').css({"overflow-x": "scroll", "overflow-y": "scroll", "height": "350px", "width": "auto"});
 			} else {
 				$('.ImgPanel').css({"overflow-x": "hidden", "overflow-y": "hidden"});
 			}

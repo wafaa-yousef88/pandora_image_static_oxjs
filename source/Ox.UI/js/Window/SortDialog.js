@@ -53,7 +53,6 @@ Ox.SortDialog = function(options, self) {
                 }
             });
     }
-
     self.$doneButton = Ox.Button({
             title: Ox._('Done')
         })
